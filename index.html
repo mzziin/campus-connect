@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Campus Connect — Find Your Class Materials Fast.</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS v4 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- GSAP + ScrollTrigger -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <!-- Lenis Smooth Scroll -->
+  <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #fdfcf8;
+      --red: #ec1313;
+      --yellow: #ffd700;
+      --black: #0a0a0a;
+      --shadow-hard: 8px 8px 0px 0px var(--black);
+      --shadow-hard-red: 8px 8px 0px 0px var(--red);
+      --shadow-card: 6px 6px 0px 0px var(--black);
+    }
+
+    html { scroll-behavior: auto; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: var(--bg);
+      color: var(--black);
+      overflow-x: hidden;
+      cursor: none;
+    }
+    
+   
+    /* ── Custom Cursor ── */
+    #cursor {
+      position: fixed;
+      width: 16px; height: 16px;
+      background: var(--red);
+      border: 2px solid var(--black);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width .15s, height .15s, background .15s;
+      mix-blend-mode: multiply;
+    }
+    #cursor.hover {
+      width: 40px; height: 40px;
+      background: var(--yellow);
+    }
+
+    /* ── Lenis ── */
+    html.lenis { height: auto; }
+    .lenis.lenis-smooth { scroll-behavior: auto !important; }
+
+    /* ── Typography ── */
+    .font-black-custom { font-weight: 900; }
+
+    /* ── Hard Shadows ── */
+    .shadow-hard        { box-shadow: var(--shadow-hard); }
+    .shadow-hard-red    { box-shadow: var(--shadow-hard-red); }
+    .shadow-card        { box-shadow: var(--shadow-card); }
+    .shadow-card-hover  { box-shadow: 12px 12px 0px 0px var(--black); }
+
+    /* ── Nav ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: var(--bg);
+      border-bottom: 3px solid var(--black);
+    }
+
+    /* ── Hero ── */
+    .hero-section { position: relative; overflow: hidden; }
+
+    .search-bar {
+      border: 3px solid var(--black);
+      border-radius: 16px;
+      box-shadow: var(--shadow-hard-red);
+      overflow: hidden;
+      background: white;
+    }
+
+    .search-bar input {
+      outline: none;
+      background: transparent;
+      width: 100%;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .btn-go {
+      background: var(--black);
+      color: white;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      letter-spacing: .08em;
+      border: none;
+      cursor: none;
+      flex-shrink: 0;
+    }
+
+    .pill-tag {
+      border: 2px solid var(--black);
+      border-radius: 999px;
+      font-size: .75rem;
+      font-weight: 700;
+      padding: 4px 14px;
+      background: white;
+      cursor: pointer;
+      transition: background .15s;
+    }
+    .pill-tag:hover, .pill-tag.active {
+      background: var(--yellow);
+    }
+    .pill-tag.active-red { background: var(--red); color: white; }
+
+    /* ── Decorative ── */
+    .deco-circle {
+      position: absolute;
+      width: 90px; height: 90px;
+      border: 3px solid var(--black);
+      border-radius: 50%;
+      background: white;
+      box-shadow: 4px 4px 0 var(--black);
+    }
+
+    .sticky-note {
+      position: absolute;
+      width: 80px; height: 80px;
+      background: var(--yellow);
+      border: 3px solid var(--black);
+      box-shadow: 4px 4px 0 var(--black);
+      transform: rotate(6deg);
+    }
+
+    /* ── Book Cards ── */
+    .book-card {
+      border: 3px solid var(--black);
+      border-radius: 16px;
+      background: white;
+      box-shadow: var(--shadow-card);
+      overflow: visible;
+      position: relative;
+      will-change: transform;
+      cursor: none;
+    }
+    .book-card.featured { border-color: var(--red); box-shadow: var(--shadow-hard-red); }
+
+    .book-card-img {
+      width: 100%; aspect-ratio: 3/4;
+      border-bottom: 3px solid var(--black);
+      border-radius: 12px 12px 0 0;
+      overflow: hidden;
+      background: #f0eee8;
+    }
+    .book-card-img img { width: 100%; height: 100%; object-fit: cover; }
+
+    .badge {
+      position: absolute;
+      top: -12px; right: 16px;
+      border: 2px solid var(--black);
+      border-radius: 999px;
+      font-size: .65rem;
+      font-weight: 800;
+      padding: 3px 10px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+    .badge-new     { background: #bbf7d0; }
+    .badge-mint    { background: #a7f3d0; }
+    .badge-used    { background: #fed7aa; }
+    .badge-likenew { background: #fce7f3; }
+
+    .btn-buy {
+      background: var(--black);
+      color: white;
+      border: 2px solid var(--black);
+      border-radius: 8px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      font-size: .75rem;
+      padding: 8px 18px;
+      letter-spacing: .08em;
+      cursor: none;
+      transition: background .15s;
+    }
+    .btn-buy:hover { background: var(--red); }
+
+    /* ── Testimonials ── */
+    .testimonial-card {
+      border: 3px solid var(--black);
+      border-radius: 16px;
+      background: white;
+      box-shadow: var(--shadow-card);
+      position: relative;
+    }
+    .quote-badge {
+      position: absolute;
+      top: -16px; left: 16px;
+      width: 32px; height: 32px;
+      background: var(--yellow);
+      border: 3px solid var(--black);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 1rem; line-height: 1;
+    }
+
+    .avatar {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      border: 2px solid var(--black);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    /* ── Student Image ── */
+    .students-img-wrap {
+      border: 3px solid var(--black);
+      border-radius: 16px;
+      box-shadow: 8px 8px 0 var(--red);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ── CTA Section ── */
+    .cta-section {
+      background: linear-gradient(135deg, #fecdd3 0%, #ffe4e6 50%, #fef3c7 100%);
+      border: 3px solid var(--black);
+      border-radius: 24px;
+    }
+
+    .btn-sell {
+      border: 3px solid var(--black);
+      border-radius: 12px;
+      background: white;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      box-shadow: var(--shadow-card);
+      cursor: none;
+      transition: box-shadow .1s, transform .1s;
+    }
+    .btn-sell:hover {
+      box-shadow: 8px 8px 0 var(--black);
+    }
+
+    /* ── Footer ── */
+    footer {
+      background: var(--black);
+      color: white;
+    }
+    .footer-social {
+      width: 38px; height: 38px;
+      border: 2px solid #555;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .7rem; font-weight: 800;
+      color: white;
+      transition: border-color .15s, background .15s;
+      cursor: none;
+    }
+    .footer-social:hover { border-color: var(--red); background: var(--red); }
+
+    /* ── Marquee ── */
+    .marquee-wrap { overflow: hidden; border-top: 3px solid var(--black); border-bottom: 3px solid var(--black); background: var(--yellow); }
+    .marquee-track { display: flex; width: max-content; animation: marquee 18s linear infinite; }
+    .marquee-track span { white-space: nowrap; padding: 0 2rem; font-weight: 800; font-size: .85rem; letter-spacing: .05em; }
+    @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* ── Scroll reveal baseline — intentionally removed.
+          GSAP gsap.from() handles initial opacity; CSS opacity:0 here
+          would override the animation target and keep elements invisible. ── */
+
+    /* ── Responsive helpers ── */
+    @media (max-width: 640px) {
+      .hero-h1 { font-size: 2.8rem !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Custom Cursor -->
+<div id="cursor"></div>
+
+<!-- ══════════════════════════════════════════ NAV ══════ -->
+<nav>
+  <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
+    <!-- Logo -->
+    <a href="#" class="flex items-center gap-2 cursor-none">
+      <div class="w-9 h-9 bg-red-500 border-[3px] border-black rounded-lg flex items-center justify-center shadow-[3px_3px_0_#000]">
+        <span class="text-white font-black text-sm">C</span>
+      </div>
+      <span class="font-black text-sm tracking-tight uppercase">Campus Connect</span>
+    </a>
+
+    <!-- Nav Links -->
+    <div class="hidden md:flex items-center gap-8">
+      <a href="#" class="font-semibold text-sm hover:text-red-500 transition-colors cursor-none">Buy Books</a>
+      <a href="#" class="font-semibold text-sm hover:text-red-500 transition-colors cursor-none">Sell Books</a>
+      <a href="#" class="font-semibold text-sm hover:text-red-500 transition-colors cursor-none">Community</a>
+    </div>
+
+    <!-- Right icons -->
+    <div class="flex items-center gap-3">
+      <button class="w-9 h-9 border-[3px] border-black rounded-full flex items-center justify-center hover:bg-yellow-200 transition-colors cursor-none shadow-[3px_3px_0_#000]">
+        <i data-lucide="message-square" class="w-4 h-4"></i>
+      </button>
+      <button class="w-9 h-9 border-[3px] border-black rounded-full overflow-hidden shadow-[3px_3px_0_#000] cursor-none bg-gradient-to-br from-orange-300 to-red-400 flex items-center justify-center">
+        <i data-lucide="user" class="w-4 h-4 text-white"></i>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════ HERO ══════ -->
+<section class="hero-section min-h-[80vh] flex flex-col items-center justify-center text-center px-6 py-20 relative">
+
+  <!-- Decorative Circle -->
+  <div class="deco-circle" id="deco-circle" style="top: 10%; left: 4%;"></div>
+
+  <!-- Sticky Note -->
+  <div class="sticky-note" id="sticky-note" style="top: 18%; right: 6%;"></div>
+
+  <!-- Second smaller sticky -->
+  <div class="sticky-note" id="sticky-note-2" style="bottom: 22%; right: 9%; width: 50px; height: 50px; transform: rotate(-8deg);"></div>
+
+  <!-- Hero Text -->
+  <div class="max-w-3xl mx-auto z-10 relative">
+    <p id="hero-eyebrow" class="reveal text-sm font-bold tracking-widest uppercase text-gray-500 mb-6">The Retro-Cool Student Marketplace</p>
+
+    <h1 id="hero-h1" class="hero-h1 reveal font-black leading-[1.05] mb-6" style="font-size: clamp(3rem, 7vw, 5.5rem);">
+      Find your class materials.<br/>
+      <span class="text-red-500">Fast.</span>
+    </h1>
+
+    <p id="hero-sub" class="reveal text-gray-500 font-medium mb-10 max-w-md mx-auto leading-relaxed">
+      Buy, sell, and swap textbooks without the campus bookstore markup.
+    </p>
+
+    <!-- Search Bar -->
+    <div id="search-wrap" class="reveal search-bar flex items-center max-w-xl mx-auto px-4 py-2 mb-6">
+      <i data-lucide="search" class="w-5 h-5 text-gray-400 flex-shrink-0 mr-3"></i>
+      <input type="text" placeholder="Search for ISBN, Title, Author, or Class…" class="flex-1 py-2 text-sm font-medium placeholder:text-gray-400" />
+      <button id="btn-go" class="btn-go rounded-xl px-6 py-3 ml-3 text-sm">GO</button>
+    </div>
+
+    <!-- Pill Tags -->
+    <div id="hero-pills" class="reveal flex flex-wrap justify-center gap-2">
+      <span class="pill-tag">#Biology</span>
+      <span class="pill-tag">#Calc 101</span>
+      <span class="pill-tag">#History</span>
+      <span class="pill-tag active-red">#Sale</span>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ MARQUEE ══════ -->
+<div class="marquee-wrap py-3">
+  <div class="marquee-track">
+    <span>📚 JUST LISTED</span><span>✦ BIOLOGY 101</span><span>✦ CALCULUS MADE EASY</span><span>✦ ART HISTORY VOL.2</span><span>✦ INTRO TO PYTHON</span><span>✦ BUSINESS LAW</span><span>✦ CHEMISTRY CENTRAL</span><span>✦ UP TO 80% OFF</span>
+    <span>📚 JUST LISTED</span><span>✦ BIOLOGY 101</span><span>✦ CALCULUS MADE EASY</span><span>✦ ART HISTORY VOL.2</span><span>✦ INTRO TO PYTHON</span><span>✦ BUSINESS LAW</span><span>✦ CHEMISTRY CENTRAL</span><span>✦ UP TO 80% OFF</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ FRESH DROPS ══════ -->
+<section class="max-w-6xl mx-auto px-6 py-20">
+  <div class="flex items-end justify-between mb-10">
+    <div>
+      <h2 class="font-black text-3xl md:text-4xl">Fresh Drops 📚</h2>
+      <p class="text-gray-500 font-medium text-sm mt-1">Just listed by students near you</p>
+    </div>
+    <a href="#" class="flex items-center gap-1 text-red-500 font-bold text-sm hover:gap-3 transition-all cursor-none">
+      View All Listings <i data-lucide="arrow-right" class="w-4 h-4"></i>
+    </a>
+  </div>
+
+  <!-- Cards Grid -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-5">
+
+    <!-- Card 1 – Featured -->
+    <div class="book-card featured card p-3">
+      <span class="badge badge-likenew">Like New</span>
+      <div class="book-card-img rounded-xl mb-3">
+        <svg viewBox="0 0 200 267" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+          <rect width="200" height="267" fill="#e8e4dc"/>
+          <rect x="20" y="20" width="160" height="227" fill="white" rx="4"/>
+          <text x="100" y="100" text-anchor="middle" font-family="serif" font-size="14" font-weight="bold" fill="#222">CHEMISTRY</text>
+          <text x="100" y="120" text-anchor="middle" font-family="serif" font-size="10" fill="#555">BEDDKOOHL</text>
+          <text x="100" y="165" text-anchor="middle" font-family="monospace" font-size="22" fill="#222">HC₂NH</text>
+          <line x1="60" y1="200" x2="140" y2="200" stroke="#ddd" stroke-width="1"/>
+          <text x="100" y="220" text-anchor="middle" font-family="serif" font-size="7" fill="#999">THE CENTRAL SCIENCE</text>
+        </svg>
+      </div>
+      <div class="px-1">
+        <h3 class="font-bold text-sm leading-tight mb-1">Chemistry: The Central Science</h3>
+        <p class="text-gray-400 text-xs font-medium mb-3">Brown, LeMay, Bursten</p>
+        <div class="flex items-center justify-between">
+          <span class="text-red-500 font-black text-lg">$45</span>
+          <button class="btn-buy">BUY</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="book-card card p-3">
+      <span class="badge badge-mint">Mint</span>
+      <div class="book-card-img rounded-xl mb-3">
+        <svg viewBox="0 0 200 267" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+          <rect width="200" height="267" fill="#1a1a2e"/>
+          <rect x="0" y="0" width="200" height="267" fill="url(#code-bg)"/>
+          <defs><linearGradient id="code-bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0f172a"/><stop offset="100%" stop-color="#1e293b"/></linearGradient></defs>
+          <text x="20" y="50" font-family="monospace" font-size="8" fill="#4ade80" opacity="0.8">def hello():</text>
+          <text x="20" y="65" font-family="monospace" font-size="8" fill="#60a5fa" opacity="0.8">  print("world")</text>
+          <text x="20" y="80" font-family="monospace" font-size="8" fill="#f472b6" opacity="0.8">for i in range(10):</text>
+          <text x="20" y="95" font-family="monospace" font-size="8" fill="#fbbf24" opacity="0.8">  x = i * 2</text>
+          <text x="20" y="110" font-family="monospace" font-size="8" fill="#4ade80" opacity="0.8">import numpy as np</text>
+          <text x="20" y="150" font-family="monospace" font-size="8" fill="#a78bfa" opacity="0.6">class Matrix:</text>
+          <text x="20" y="165" font-family="monospace" font-size="8" fill="#60a5fa" opacity="0.6">  def __init__:</text>
+          <rect x="60" y="190" width="80" height="50" rx="4" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+          <rect x="70" y="195" width="60" height="8" rx="2" fill="#374151"/>
+        </svg>
+      </div>
+      <div class="px-1">
+        <h3 class="font-bold text-sm leading-tight mb-1">Intro to Python Programming</h3>
+        <p class="text-gray-400 text-xs font-medium mb-3">John M. Zelle</p>
+        <div class="flex items-center justify-between">
+          <span class="text-red-500 font-black text-lg">$60</span>
+          <button class="btn-buy">BUY</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="book-card card p-3">
+      <span class="badge badge-used">Used</span>
+      <div class="book-card-img rounded-xl mb-3">
+        <svg viewBox="0 0 200 267" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+          <rect width="200" height="267" fill="#d4c5a9"/>
+          <rect x="30" y="60" width="140" height="12" rx="2" fill="#8b7355"/>
+          <rect x="30" y="78" width="140" height="12" rx="2" fill="#9b8365"/>
+          <rect x="30" y="96" width="140" height="12" rx="2" fill="#8b7355"/>
+          <rect x="30" y="114" width="140" height="12" rx="2" fill="#a08060"/>
+          <rect x="30" y="132" width="100" height="12" rx="2" fill="#8b7355"/>
+          <rect x="20" y="20" width="160" height="10" rx="2" fill="#5a4a3a"/>
+          <rect x="20" y="237" width="160" height="10" rx="2" fill="#5a4a3a"/>
+          <text x="100" y="200" text-anchor="middle" font-family="serif" font-size="11" font-weight="bold" fill="#3a2a1a">ART HISTORY</text>
+          <text x="100" y="215" text-anchor="middle" font-family="serif" font-size="9" fill="#5a4a3a">Volume 2</text>
+        </svg>
+      </div>
+      <div class="px-1">
+        <h3 class="font-bold text-sm leading-tight mb-1">Art History Vol. 2</h3>
+        <p class="text-gray-400 text-xs font-medium mb-3">Marilyn Stokstad</p>
+        <div class="flex items-center justify-between">
+          <span class="text-red-500 font-black text-lg">$20</span>
+          <button class="btn-buy">BUY</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 4 -->
+    <div class="book-card card p-3">
+      <span class="badge badge-new">New</span>
+      <div class="book-card-img rounded-xl mb-3">
+        <svg viewBox="0 0 200 267" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+          <rect width="200" height="267" fill="#1e1e1e"/>
+          <rect x="0" y="0" width="200" height="267" fill="url(#dark-grad)"/>
+          <defs><linearGradient id="dark-grad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#111827"/><stop offset="100%" stop-color="#374151"/></linearGradient></defs>
+          <text x="30" y="60" font-family="serif" font-weight="bold" font-size="18" fill="white">BUSINESS</text>
+          <text x="30" y="82" font-family="serif" font-weight="bold" font-size="18" fill="#ef4444">LAW</text>
+          <line x1="30" y1="95" x2="170" y2="95" stroke="#555" stroke-width="1"/>
+          <text x="30" y="115" font-family="sans-serif" font-size="8" fill="#9ca3af">The Legal Environment</text>
+          <text x="30" y="130" font-family="sans-serif" font-size="8" fill="#9ca3af">of Business</text>
+          <rect x="30" y="180" width="60" height="8" rx="2" fill="#374151"/>
+          <rect x="30" y="194" width="40" height="8" rx="2" fill="#374151"/>
+        </svg>
+      </div>
+      <div class="px-1">
+        <h3 class="font-bold text-sm leading-tight mb-1">Business Law: The Environment</h3>
+        <p class="text-gray-400 text-xs font-medium mb-3">Clarkson, Miller</p>
+        <div class="flex items-center justify-between">
+          <span class="text-red-500 font-black text-lg">$85</span>
+          <button class="btn-buy">BUY</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ SOCIAL PROOF ══════ -->
+<section class="max-w-6xl mx-auto px-6 pb-20">
+  <div class="grid md:grid-cols-2 gap-8 items-center">
+
+    <!-- Testimonials -->
+    <div class="flex flex-col gap-8">
+
+      <div class="testimonial-card reveal p-5 pt-8">
+        <div class="quote-badge">"</div>
+        <div class="flex items-center gap-3 mb-3">
+          <div class="avatar bg-gradient-to-br from-orange-300 to-rose-400 flex items-center justify-center">
+            <span class="text-white font-black text-sm">S</span>
+          </div>
+          <div>
+            <p class="font-bold text-sm">Sarah J.</p>
+            <div class="flex gap-0.5 mt-0.5">
+              <span class="text-yellow-400 text-xs">★★★★★</span>
+            </div>
+          </div>
+        </div>
+        <p class="text-sm text-gray-600 font-medium leading-relaxed">
+          "Finally found that rare Bio textbook without breaking the bank. Super smooth transaction!"
+        </p>
+      </div>
+
+      <div class="testimonial-card reveal p-5 pt-8" style="margin-left: 1.5rem;">
+        <div class="quote-badge">"</div>
+        <div class="flex items-center gap-3 mb-3">
+          <div class="avatar bg-gradient-to-br from-sky-300 to-indigo-400 flex items-center justify-center">
+            <span class="text-white font-black text-sm">M</span>
+          </div>
+          <div>
+            <p class="font-bold text-sm">Mark S.</p>
+            <div class="flex gap-0.5 mt-0.5">
+              <span class="text-yellow-400 text-xs">★★★★★</span>
+            </div>
+          </div>
+        </div>
+        <p class="text-sm text-gray-600 font-medium leading-relaxed">
+          "Using this website gave me a full good rating. I sold all my last semester books in under 24 hours!"
+        </p>
+      </div>
+
+      <div class="testimonial-card reveal p-5 pt-8">
+        <div class="quote-badge">"</div>
+        <div class="flex items-center gap-3 mb-3">
+          <div class="avatar bg-gradient-to-br from-emerald-300 to-teal-400 flex items-center justify-center">
+            <span class="text-white font-black text-sm">A</span>
+          </div>
+          <div>
+            <p class="font-bold text-sm">Alex M.</p>
+            <div class="flex gap-0.5 mt-0.5">
+              <span class="text-yellow-400 text-xs">★★★★★</span>
+            </div>
+          </div>
+        </div>
+        <p class="text-sm text-gray-600 font-medium leading-relaxed">
+          "Campus Connect is a lifesaver. Sold my old Calc book to a freshman in my dorm. Easy money."
+        </p>
+      </div>
+    </div>
+
+    <!-- Student Image -->
+    <div class="students-img-wrap reveal" style="aspect-ratio: 4/3; overflow: hidden;">
+      <svg viewBox="0 0 600 450" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+        <rect width="600" height="450" fill="#e5e5e5"/>
+        <!-- Sky -->
+        <rect width="600" height="200" fill="#d4d4d4"/>
+        <!-- Building/stairs suggestion -->
+        <rect x="0" y="200" width="600" height="250" fill="#c4c4c4"/>
+        <rect x="100" y="160" width="400" height="200" fill="#bdbdbd"/>
+        <!-- Steps -->
+        <rect x="80" y="350" width="440" height="15" fill="#b0b0b0"/>
+        <rect x="90" y="340" width="420" height="12" fill="#b8b8b8"/>
+        <rect x="100" y="330" width="400" height="12" fill="#c0c0c0"/>
+        <!-- Group of people silhouettes -->
+        <g fill="#555">
+          <ellipse cx="180" cy="295" rx="18" ry="22"/>
+          <rect x="165" y="315" width="30" height="45" rx="4"/>
+          <ellipse cx="230" cy="288" rx="16" ry="20"/>
+          <rect x="216" y="306" width="28" height="48" rx="4"/>
+          <ellipse cx="278" cy="285" rx="17" ry="21"/>
+          <rect x="264" y="304" width="28" height="50" rx="4"/>
+          <ellipse cx="326" cy="287" rx="17" ry="21"/>
+          <rect x="312" y="306" width="28" height="48" rx="4"/>
+          <ellipse cx="374" cy="290" rx="16" ry="20"/>
+          <rect x="360" y="308" width="28" height="46" rx="4"/>
+          <ellipse cx="420" cy="293" rx="17" ry="21"/>
+          <rect x="406" y="312" width="28" height="44" rx="4"/>
+        </g>
+        <!-- Trees suggestion -->
+        <ellipse cx="60" cy="200" rx="40" ry="60" fill="#a0a0a0"/>
+        <ellipse cx="540" cy="190" rx="45" ry="65" fill="#a8a8a8"/>
+        <!-- Photo grain overlay -->
+        <rect width="600" height="450" fill="url(#grain)" opacity="0.1"/>
+        <defs>
+          <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+        </defs>
+      </svg>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ STATS STRIP ══════ -->
+<div class="border-t-[3px] border-b-[3px] border-black bg-white py-8 mb-20">
+  <div class="max-w-6xl mx-auto px-6 grid grid-cols-3 gap-6 text-center">
+    <div>
+      <p class="font-black text-4xl md:text-5xl">12k<span class="text-red-500">+</span></p>
+      <p class="text-gray-500 font-semibold text-sm mt-1">Books Listed</p>
+    </div>
+    <div class="border-l-[3px] border-r-[3px] border-black">
+      <p class="font-black text-4xl md:text-5xl">4.9<span class="text-red-500">★</span></p>
+      <p class="text-gray-500 font-semibold text-sm mt-1">Avg. Rating</p>
+    </div>
+    <div>
+      <p class="font-black text-4xl md:text-5xl">80<span class="text-red-500">%</span></p>
+      <p class="text-gray-500 font-semibold text-sm mt-1">Avg. Savings</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ CTA SECTION ══════ -->
+<section class="max-w-6xl mx-auto px-6 pb-20">
+  <div class="cta-section p-10 md:p-16 relative overflow-hidden shadow-[8px_8px_0_#000]">
+    <!-- BG decoration -->
+    <div class="absolute right-0 top-0 w-48 h-48 bg-red-200 rounded-full translate-x-1/2 -translate-y-1/2 opacity-40"></div>
+    <div class="absolute right-16 bottom-0 w-24 h-24 bg-yellow-300 rounded-full translate-y-1/2 opacity-50 border-[3px] border-black"></div>
+
+    <div class="relative z-10">
+      <h2 class="font-black text-3xl md:text-5xl mb-3">Sell Your Books</h2>
+      <p class="text-gray-600 font-medium mb-8 max-w-sm leading-relaxed">
+        Clear your shelf and fill your wallet.<br/>Listing takes less than 2 minutes.
+      </p>
+      <button id="btn-sell" class="btn-sell px-8 py-4 text-base">
+        Start Selling →
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════ FOOTER ══════ -->
+<footer class="border-t-[3px] border-black">
+  <div class="max-w-6xl mx-auto px-6 py-12">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 mb-12">
+      <div>
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-8 h-8 bg-red-500 border-[3px] border-white rounded-lg flex items-center justify-center">
+            <span class="text-white font-black text-xs">C</span>
+          </div>
+          <span class="font-black text-sm tracking-tight uppercase text-white">Campus Connect</span>
+        </div>
+        <p class="text-gray-400 text-xs font-medium max-w-xs leading-relaxed">
+          Made for students by students. The easiest way to buy and sell textbooks on campus.
+        </p>
+      </div>
+      <div class="flex gap-3">
+        <div class="footer-social">IG</div>
+        <div class="footer-social">TW</div>
+        <div class="footer-social">TT</div>
+      </div>
+    </div>
+
+    <div class="border-t border-gray-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+      <div class="flex flex-wrap gap-6">
+        <a href="#" class="text-gray-500 text-xs font-semibold hover:text-white transition-colors cursor-none">About Us</a>
+        <a href="#" class="text-gray-500 text-xs font-semibold hover:text-white transition-colors cursor-none">Safety Guidelines</a>
+        <a href="#" class="text-gray-500 text-xs font-semibold hover:text-white transition-colors cursor-none">Terms of Service</a>
+        <a href="#" class="text-gray-500 text-xs font-semibold hover:text-white transition-colors cursor-none">Privacy Policy</a>
+      </div>
+      <p class="text-gray-600 text-xs">© 2025 Campus Connect</p>
+    </div>
+  </div>
+</footer>
+
+
+<!-- ══════════════════════════════════════════ SCRIPTS ══════ -->
+<script>
+  // ── Lucide Icons
+  lucide.createIcons();
+
+  // ── Lenis Smooth Scroll
+  const lenis = new Lenis({
+    duration: 1.2,
+    easing: t => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    smoothWheel: true,
+  });
+  function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+  requestAnimationFrame(raf);
+
+  // Connect Lenis with GSAP ScrollTrigger
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add(time => lenis.raf(time * 1000));
+  gsap.ticker.lagSmoothing(0);
+
+  // ── Custom Cursor
+  const cursor = document.getElementById('cursor');
+  let mouseX = 0, mouseY = 0;
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX; mouseY = e.clientY;
+    gsap.to(cursor, { x: mouseX, y: mouseY, duration: 0.08, ease: 'power2.out' });
+  });
+  document.querySelectorAll('a, button, .book-card, .pill-tag, .footer-social').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+  });
+
+  // ── Hero Entrance Animation
+  gsap.registerPlugin(ScrollTrigger);
+  const heroTl = gsap.timeline({ defaults: { ease: 'back.out(1.4)' } });
+  heroTl
+    .from('#hero-eyebrow', { y: 30, opacity: 0, duration: 0.7 })
+    .from('#hero-h1',      { y: 50, opacity: 0, duration: 0.8 }, '-=0.4')
+    .from('#hero-sub',     { y: 30, opacity: 0, duration: 0.6 }, '-=0.5')
+    .from('#search-wrap',  { y: 40, opacity: 0, duration: 0.7, scale: 0.97 }, '-=0.4')
+    .from('#hero-pills',   { y: 20, opacity: 0, duration: 0.5 }, '-=0.3');
+
+  // ── Floating Decorative Elements
+  function floatEl(id, xAmp, yAmp, dur) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    gsap.to(el, {
+      x: `+=${xAmp}`, y: `+=${yAmp}`,
+      duration: dur,
+      ease: 'sine.inOut',
+      repeat: -1,
+      yoyo: true,
+    });
+  }
+  floatEl('deco-circle',  8, 12, 3.2);
+  floatEl('sticky-note', -6, 10, 2.8);
+  floatEl('sticky-note-2', 5, -8, 3.6);
+
+  // ── Parallax on decorative elements with mouse
+  document.addEventListener('mousemove', e => {
+    const nx = (e.clientX / window.innerWidth  - 0.5) * 2;
+    const ny = (e.clientY / window.innerHeight - 0.5) * 2;
+    gsap.to('#deco-circle',  { x: nx * 18, y: ny * 12, duration: 1.2, ease: 'power2.out', overwrite: 'auto' });
+    gsap.to('#sticky-note',  { x: nx * -14, y: ny * 10, duration: 1.4, ease: 'power2.out', overwrite: 'auto' });
+    gsap.to('#sticky-note-2',{ x: nx * 10, y: ny * -8, duration: 1.6, ease: 'power2.out', overwrite: 'auto' });
+  });
+
+  // ── Fresh Drops — staggered card entrance with ScrollTrigger
+  gsap.from('.card', {
+    y: 60, opacity: 0,
+    duration: 0.7,
+    stagger: 0.12,
+    ease: 'back.out(1.7)',
+    scrollTrigger: {
+      trigger: '.card',
+      start: 'top 85%',
+    }
+  });
+
+  // ── Card Hover – Neobrutalist pop
+  document.querySelectorAll('.book-card').forEach(card => {
+    const isFeatured = card.classList.contains('featured');
+    const shadowColor = isFeatured ? '#ef4444' : 'rgba(0,0,0,1)';
+
+    card.addEventListener('mouseenter', () => {
+      gsap.to(card, {
+        x: -6, y: -6,
+        boxShadow: `12px 12px 0px 0px ${shadowColor}`,
+        duration: 0.25,
+        ease: 'power2.out',
+      });
+    });
+    card.addEventListener('mouseleave', () => {
+      gsap.to(card, {
+        x: 0, y: 0,
+        boxShadow: isFeatured
+          ? '8px 8px 0px 0px #ef4444'
+          : '6px 6px 0px 0px rgba(0,0,0,1)',
+        duration: 0.3,
+        ease: 'elastic.out(1, 0.6)',
+      });
+    });
+    card.addEventListener('mousedown', () => {
+      gsap.to(card, { scale: 0.97, duration: 0.1 });
+    });
+    card.addEventListener('mouseup', () => {
+      gsap.to(card, { scale: 1, duration: 0.2, ease: 'back.out(2)' });
+    });
+  });
+
+  // ── Scroll Reveal for testimonials
+  gsap.from('.testimonial-card', {
+    y: 40, opacity: 0,
+    duration: 0.6,
+    stagger: 0.15,
+    ease: 'back.out(1.5)',
+    scrollTrigger: { trigger: '.testimonial-card', start: 'top 85%' }
+  });
+
+  gsap.from('.students-img-wrap', {
+    x: 40, opacity: 0,
+    duration: 0.8,
+    ease: 'power3.out',
+    scrollTrigger: { trigger: '.students-img-wrap', start: 'top 80%' }
+  });
+
+  // ── Magnetic Buttons
+  function makeMagnetic(btnId, strength = 0.35) {
+    const btn = document.getElementById(btnId);
+    if (!btn) return;
+
+    btn.addEventListener('mousemove', e => {
+      const rect = btn.getBoundingClientRect();
+      const cx = rect.left + rect.width  / 2;
+      const cy = rect.top  + rect.height / 2;
+      const dx = (e.clientX - cx) * strength;
+      const dy = (e.clientY - cy) * strength;
+      gsap.to(btn, { x: dx, y: dy, duration: 0.3, ease: 'power2.out' });
+    });
+    btn.addEventListener('mouseleave', () => {
+      gsap.to(btn, { x: 0, y: 0, duration: 0.5, ease: 'elastic.out(1, 0.4)' });
+    });
+    btn.addEventListener('mousedown', () => {
+      gsap.to(btn, { scale: 0.95, duration: 0.1 });
+    });
+    btn.addEventListener('mouseup', () => {
+      gsap.to(btn, { scale: 1, duration: 0.25, ease: 'back.out(2)' });
+    });
+  }
+  makeMagnetic('btn-go',   0.4);
+  makeMagnetic('btn-sell', 0.3);
+
+  // ── Stat counter animation
+  gsap.from('.grid.grid-cols-3 .font-black', {
+    textContent: 0,
+    duration: 1.5,
+    ease: 'power2.out',
+    scrollTrigger: { trigger: '.grid.grid-cols-3', start: 'top 80%' }
+  });
+
+  // ── CTA section entrance
+  gsap.from('.cta-section', {
+    y: 40, opacity: 0,
+    duration: 0.8,
+    ease: 'back.out(1.5)',
+    scrollTrigger: { trigger: '.cta-section', start: 'top 85%' }
+  });
+
+  // ── Nav entrance
+  gsap.from('nav', { y: -80, opacity: 0, duration: 0.6, ease: 'power3.out' });
+</script>
+</body>
+</html>
