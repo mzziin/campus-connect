@@ -1,83 +1,141 @@
 <!-- ============================================================
      CAMPUS CONNECT — components/header.html
      Loaded via fetch() into <div id="site-header"> on every page.
-     core.js handles: lucide re-render, active nav link, cursor binding.
+
+     AUTH-AWARE ELEMENTS:
+     Elements with class "auth-only" are hidden by default.
+     They become visible when <body data-auth="true"> is set.
+     Elements with class "guest-only" are hidden when logged in.
+
+     Each page sets auth state like:
+       <body data-auth="true" data-user="Alex" data-kp="1240">
      ============================================================ -->
 <nav class="site-nav">
   <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between gap-4">
 
-    <!-- Logo -->
+    <!-- ── Logo ── -->
     <a href="/index.html" data-page="index.html"
-       class="flex items-center gap-2 cursor-none">
-      <div class="w-9 h-9 bg-red-500 border-[3px] border-black rounded-lg flex items-center justify-center"
-           style="box-shadow: 3px 3px 0 #000;">
+       class="flex items-center gap-2 cursor-none flex-shrink-0">
+      <div class="w-9 h-9 bg-red-500 border-[3px] border-black rounded-lg
+                  flex items-center justify-center"
+           style="box-shadow:3px 3px 0 #000;">
         <span class="text-white font-black text-sm">C</span>
       </div>
       <span class="font-black text-sm tracking-tight uppercase">Campus Connect</span>
     </a>
 
-    <!-- Desktop Nav Links -->
+    <!-- ── Desktop Nav Links ── -->
     <div class="hidden md:flex items-center gap-8">
-      <a href="/pages/search.html"   data-page="search.html"
-         class="font-semibold text-sm hover:text-red-500 transition-colors cursor-none">
-        Buy Books
+      <a href="/pages/search.html"    data-page="search.html"
+         class="nav-link font-semibold text-sm hover:text-red-500 transition-colors cursor-none">
+        Marketplace
       </a>
-      <a href="/pages/add-book.html" data-page="add-book.html"
-         class="font-semibold text-sm hover:text-red-500 transition-colors cursor-none">
-        Sell Books
+      <a href="/pages/dashboard.html" data-page="dashboard.html"
+         class="nav-link font-semibold text-sm hover:text-red-500 transition-colors cursor-none">
+        Dashboard
       </a>
-      <a href="#"                    data-page="community.html"
-         class="font-semibold text-sm hover:text-red-500 transition-colors cursor-none">
+      <a href="#" data-page="community.html"
+         class="nav-link font-semibold text-sm hover:text-red-500 transition-colors cursor-none">
         Community
       </a>
     </div>
 
-    <!-- Right Actions -->
+    <!-- ── Right Actions ── -->
     <div class="flex items-center gap-3">
 
-      <!-- Messages -->
+      <!-- ⚡ KP Badge — AUTH ONLY -->
+      <a href="/pages/dashboard.html"
+         id="nav-kp-badge"
+         class="auth-only hidden items-center gap-1.5 bg-black text-white
+                border-[3px] border-black rounded-full px-4 py-1.5 cursor-none
+                hover:bg-red-500 transition-colors"
+         style="box-shadow:3px 3px 0 #000;" title="Karma Points">
+        <span class="text-yellow-400 text-sm">⚡</span>
+        <span class="font-black text-sm" id="nav-kp-value">0 KP</span>
+      </a>
+
+      <!-- 🔔 Notification Bell — AUTH ONLY -->
+      <button id="nav-bell"
+              class="auth-only hidden relative w-9 h-9 border-[3px] border-black
+                     rounded-full items-center justify-center hover:bg-yellow-200
+                     transition-colors cursor-none"
+              style="box-shadow:3px 3px 0 #000;" title="Notifications">
+        <i data-lucide="bell" class="w-4 h-4"></i>
+        <span class="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500
+                     border-2 border-white rounded-full"></span>
+      </button>
+
+      <!-- 💬 Messages — GUEST ONLY -->
       <a href="/pages/messages.html" data-page="messages.html"
-         class="w-9 h-9 border-[3px] border-black rounded-full flex items-center justify-center
-                hover:bg-yellow-200 transition-colors cursor-none"
-         style="box-shadow: 3px 3px 0 #000;" title="Messages">
+         class="guest-only w-9 h-9 border-[3px] border-black rounded-full
+                flex items-center justify-center hover:bg-yellow-200
+                transition-colors cursor-none"
+         style="box-shadow:3px 3px 0 #000;" title="Messages">
         <i data-lucide="message-square" class="w-4 h-4"></i>
       </a>
 
-      <!-- User avatar / login -->
-      <a href="/pages/login.html" data-page="login.html" id="nav-user-btn"
-         class="w-9 h-9 border-[3px] border-black rounded-full overflow-hidden cursor-none
-                bg-gradient-to-br from-orange-300 to-red-400 flex items-center justify-center"
-         style="box-shadow: 3px 3px 0 #000;" title="Account">
+      <!-- 👤 Avatar — AUTH ONLY -->
+      <a href="/pages/dashboard.html" data-page="dashboard.html"
+         id="nav-avatar"
+         class="auth-only hidden w-9 h-9 border-[3px] border-black rounded-full
+                overflow-hidden cursor-none bg-gradient-to-br from-orange-300
+                to-red-400 items-center justify-center"
+         style="box-shadow:3px 3px 0 #000;" title="My Profile">
         <i data-lucide="user" class="w-4 h-4 text-white"></i>
       </a>
 
-      <!-- Mobile menu toggle -->
+      <!-- 👤 Login — GUEST ONLY -->
+      <a href="/pages/login.html" data-page="login.html"
+         class="guest-only w-9 h-9 border-[3px] border-black rounded-full
+                overflow-hidden cursor-none bg-gradient-to-br from-orange-300
+                to-red-400 flex items-center justify-center"
+         style="box-shadow:3px 3px 0 #000;" title="Login">
+        <i data-lucide="user" class="w-4 h-4 text-white"></i>
+      </a>
+
+      <!-- ☰ Mobile toggle -->
       <button id="mobile-menu-btn"
-              class="md:hidden w-9 h-9 border-[3px] border-black rounded-lg flex items-center
-                     justify-center cursor-none"
-              style="box-shadow: 3px 3px 0 #000;" aria-label="Toggle menu">
+              class="md:hidden w-9 h-9 border-[3px] border-black rounded-lg
+                     flex items-center justify-center cursor-none"
+              style="box-shadow:3px 3px 0 #000;" aria-label="Toggle menu">
         <i data-lucide="menu" class="w-4 h-4"></i>
       </button>
     </div>
   </div>
 
-  <!-- Mobile Dropdown -->
+  <!-- ── Mobile Dropdown ── -->
   <div id="mobile-menu"
-       class="md:hidden hidden border-t-[3px] border-black bg-[#fdfcf8] px-6 py-4 flex flex-col gap-4">
-    <a href="/pages/search.html"   class="font-semibold text-sm cursor-none hover:text-red-500">Buy Books</a>
-    <a href="/pages/add-book.html" class="font-semibold text-sm cursor-none hover:text-red-500">Sell Books</a>
-    <a href="#"                    class="font-semibold text-sm cursor-none hover:text-red-500">Community</a>
-    <a href="/pages/messages.html" class="font-semibold text-sm cursor-none hover:text-red-500">Messages</a>
-    <a href="/pages/login.html"    class="font-semibold text-sm cursor-none hover:text-red-500">Login / Register</a>
+       class="md:hidden hidden border-t-[3px] border-black bg-[#fdfcf8]
+              px-6 py-4 flex flex-col gap-4">
+    <a href="/pages/search.html"    class="font-semibold text-sm cursor-none hover:text-red-500">Marketplace</a>
+    <a href="/pages/dashboard.html" class="font-semibold text-sm cursor-none hover:text-red-500">Dashboard</a>
+    <a href="#"                     class="font-semibold text-sm cursor-none hover:text-red-500">Community</a>
+    <a href="/pages/messages.html"  class="font-semibold text-sm cursor-none hover:text-red-500">Messages</a>
+    <a href="/pages/login.html"     class="guest-only font-semibold text-sm cursor-none hover:text-red-500">Login / Register</a>
   </div>
 </nav>
 
-<!-- Mobile menu toggle script (self-contained, no deps) -->
 <script>
-  (function () {
-    const btn  = document.getElementById('mobile-menu-btn');
-    const menu = document.getElementById('mobile-menu');
-    if (!btn || !menu) return;
-    btn.addEventListener('click', () => menu.classList.toggle('hidden'));
-  })();
+(function () {
+  /* Mobile toggle */
+  const btn  = document.getElementById('mobile-menu-btn');
+  const menu = document.getElementById('mobile-menu');
+  if (btn && menu) btn.addEventListener('click', () => menu.classList.toggle('hidden'));
+
+  /* Auth-state reveal */
+  const body   = document.body;
+  const isAuth = body.dataset.auth === 'true';
+  const kp     = body.dataset.kp || '0';
+
+  if (isAuth) {
+    document.querySelectorAll('.auth-only').forEach(el => {
+      el.classList.remove('hidden');
+      el.classList.add('flex');
+    });
+    document.querySelectorAll('.guest-only').forEach(el => el.classList.add('hidden'));
+
+    const kpEl = document.getElementById('nav-kp-value');
+    if (kpEl) kpEl.textContent = Number(kp).toLocaleString() + ' KP';
+  }
+})();
 </script>
