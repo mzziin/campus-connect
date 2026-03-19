@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — Campus Connect</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
+
+  <!-- Tailwind CSS v4 -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- GSAP + ScrollTrigger -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <!-- Lenis -->
+  <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
+
+  <!-- Lucide -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <!-- Shared CSS -->
+  <link rel="stylesheet" href="/assets/css/main.css" />
+
+  <style>
+    /* ── Dashboard-specific styles ── */
+
+    /* Rank Card */
+    .rank-card {
+      border: 3px solid var(--black);
+      border-radius: 20px;
+      background: white;
+      box-shadow: var(--shadow-hard);
+      padding: 28px 32px;
+    }
+
+    /* Karma Progress Bar */
+    .progress-track {
+      background: #e5e5e5;
+      border: 2px solid var(--black);
+      border-radius: 999px;
+      height: 18px;
+      overflow: hidden;
+      position: relative;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
+      width: 0%; /* animated by GSAP */
+      position: relative;
+    }
+    .progress-fill::after {
+      content: '';
+      position: absolute;
+      right: 0; top: 50%;
+      transform: translate(50%, -50%);
+      width: 14px; height: 14px;
+      background: white;
+      border: 3px solid var(--black);
+      border-radius: 50%;
+    }
+
+    /* Stat Cards */
+    .stat-card {
+      border: 3px solid var(--black);
+      border-radius: 20px;
+      background: white;
+      box-shadow: var(--shadow-card);
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card.earnings { background: #fff0f0; border-color: var(--red); box-shadow: 6px 6px 0 var(--red); }
+    .stat-card.students { background: #eff6ff; }
+    .stat-card.gifts    { background: #fefce8; }
+
+    .stat-icon {
+      width: 44px; height: 44px;
+      border: 3px solid var(--black);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      background: white;
+      box-shadow: 3px 3px 0 var(--black);
+      flex-shrink: 0;
+    }
+
+    .stat-badge {
+      border: 2px solid var(--black);
+      border-radius: 999px;
+      font-size: .65rem;
+      font-weight: 800;
+      padding: 3px 10px;
+      white-space: nowrap;
+    }
+    .stat-badge.green  { background: #dcfce7; color: #166534; }
+    .stat-badge.blue   { background: #dbeafe; color: #1e40af; }
+    .stat-badge.yellow { background: var(--yellow); color: #713f12; }
+
+    /* Section Titles */
+    .section-title {
+      font-weight: 900;
+      font-size: 1.2rem;
+      position: relative;
+      display: inline-block;
+      padding-bottom: 6px;
+    }
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0;
+      width: 100%; height: 3px;
+      background: var(--red);
+      border-radius: 2px;
+    }
+
+    /* Recent Customers */
+    .customers-card {
+      border: 3px solid var(--black);
+      border-radius: 20px;
+      background: white;
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+    }
+    .customer-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 24px;
+      border-bottom: 2px solid #f0ede6;
+      transition: background .15s;
+    }
+    .customer-row:last-child { border-bottom: none; }
+    .customer-row:hover      { background: #fdfcf8; }
+
+    .customer-avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      border: 3px solid var(--black);
+      overflow: hidden;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: .9rem;
+    }
+
+    .transaction-positive { color: #16a34a; font-weight: 800; font-size: .95rem; }
+    .transaction-kp       { color: #2563eb; font-weight: 800; font-size: .95rem; }
+
+    /* Rewards Store */
+    .reward-card {
+      border: 3px solid #e5e0d8;
+      border-radius: 16px;
+      background: white;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: border-color .15s, box-shadow .15s;
+      cursor: none;
+    }
+    .reward-card:hover {
+      border-color: var(--black);
+      box-shadow: 4px 4px 0 var(--black);
+    }
+    .reward-icon {
+      width: 52px; height: 52px;
+      border: 3px solid #d4cfc7;
+      border-radius: 14px;
+      background: #f5f2ec;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .kp-tag {
+      background: #e8e4dc;
+      border: 2px solid var(--black);
+      border-radius: 6px;
+      font-size: .7rem;
+      font-weight: 800;
+      padding: 3px 8px;
+      display: inline-block;
+      margin-top: 4px;
+    }
+
+    /* Want More KP Card */
+    .kp-promo-card {
+      background: var(--black);
+      border: 3px solid var(--black);
+      border-radius: 20px;
+      padding: 28px;
+      position: relative;
+      overflow: hidden;
+    }
+    .kp-promo-card::before {
+      content: 'KP';
+      position: absolute;
+      right: -10px; bottom: -20px;
+      font-size: 8rem;
+      font-weight: 900;
+      color: rgba(255,255,255,.06);
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .btn-list-free {
+      background: var(--yellow);
+      color: var(--black);
+      border: 3px solid var(--black);
+      border-radius: 10px;
+      font-family: var(--font-body);
+      font-weight: 900;
+      font-size: .8rem;
+      padding: 10px 20px;
+      letter-spacing: .06em;
+      cursor: none;
+      box-shadow: 4px 4px 0 rgba(255,255,255,.3);
+      transition: background .15s, box-shadow .15s;
+    }
+    .btn-list-free:hover { background: #fde047; }
+
+    /* Rank badge pill */
+    .rank-lvl-badge {
+      background: var(--yellow);
+      border: 2px solid var(--black);
+      border-radius: 999px;
+      font-size: .7rem;
+      font-weight: 900;
+      padding: 3px 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 2px 2px 0 var(--black);
+    }
+
+    /* KP number counter glow */
+    .kp-number {
+      font-size: clamp(2.5rem, 5vw, 3.5rem);
+      font-weight: 900;
+      line-height: 1;
+      color: var(--black);
+    }
+
+    /* Redeem KP button */
+    .btn-redeem {
+      background: var(--black);
+      color: white;
+      border: 3px solid var(--black);
+      border-radius: 10px;
+      font-family: var(--font-body);
+      font-weight: 800;
+      font-size: .75rem;
+      padding: 8px 16px;
+      cursor: none;
+      box-shadow: 3px 3px 0 #555;
+      transition: background .15s;
+    }
+    .btn-redeem:hover { background: var(--red); border-color: var(--red); }
+
+    /* Greeting */
+    .greeting-name {
+      font-style: italic;
+      color: var(--red);
+    }
+  </style>
+</head>
+
+<!-- Auth state set here — PHP will populate data-user and data-kp dynamically later -->
+<body data-auth="true" data-user="Alex" data-kp="1240">
+
+<!-- Custom Cursor -->
+<div id="cursor"></div>
+
+<!-- Header (injected) -->
+<div id="site-header"></div>
+
+<!-- ══════════════════════════════════════════ MAIN ══ -->
+<main class="max-w-6xl mx-auto px-6 py-10">
+
+  <!-- ── TOP GRID: Greeting + Rank Card ── -->
+  <div class="grid md:grid-cols-[260px_1fr] gap-6 mb-8">
+
+    <!-- Greeting -->
+    <div id="db-greeting" class="flex flex-col justify-center">
+      <h1 class="font-black leading-tight mb-3"
+          style="font-size: clamp(2.2rem, 4vw, 3rem);">
+        Hey, <span class="greeting-name" id="greeting-name">Alex!</span>
+      </h1>
+      <p class="text-gray-500 font-medium leading-relaxed">
+        Ready to level up your<br/>selling game today?
+      </p>
+    </div>
+
+    <!-- Rank Card -->
+    <div class="rank-card" id="db-rank-card">
+      <div class="flex items-start justify-between mb-5">
+
+        <!-- Left: Rank info -->
+        <div>
+          <p class="text-[10px] font-black tracking-[.15em] uppercase text-gray-400 mb-2">
+            Current Rank
+          </p>
+          <div class="flex items-center gap-3">
+            <h2 class="font-black text-2xl md:text-3xl">Campus Bibliophile</h2>
+            <span class="rank-lvl-badge">Lvl 4</span>
+          </div>
+        </div>
+
+        <!-- Right: KP total -->
+        <div class="text-right flex-shrink-0">
+          <p class="text-[10px] font-black tracking-[.15em] uppercase text-gray-400 mb-1">
+            Karma Points
+          </p>
+          <div class="flex items-end justify-end gap-1">
+            <span class="kp-number" id="kp-counter">0</span>
+            <span class="text-gray-400 font-bold text-sm mb-1">KP</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-[10px] font-black tracking-[.12em] uppercase text-gray-500">Bibliophile</span>
+        <span class="text-[10px] font-black tracking-[.12em] uppercase text-red-500">
+          Next: Academic Legend
+        </span>
+      </div>
+      <div class="progress-track mb-2">
+        <div class="progress-fill" id="progress-fill"></div>
+      </div>
+      <p class="text-right text-[11px] text-gray-400 font-semibold">360 KP to next level</p>
+    </div>
+  </div>
+
+  <!-- ── STAT CARDS ── -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10" id="db-stats">
+
+    <!-- Total Earnings -->
+    <div class="stat-card earnings">
+      <div class="flex items-start justify-between mb-4">
+        <div class="stat-icon">
+          <i data-lucide="dollar-sign" class="w-5 h-5"></i>
+        </div>
+        <span class="stat-badge green">+12% this week</span>
+      </div>
+      <p class="text-[10px] font-black tracking-[.15em] uppercase text-gray-500 mb-2">
+        Total Earnings
+      </p>
+      <p class="font-black text-4xl mb-1" id="earnings-counter">$0</p>
+      <p class="text-gray-400 text-xs font-semibold">From 18 items sold</p>
+    </div>
+
+    <!-- Students Helped -->
+    <div class="stat-card students">
+      <div class="flex items-start justify-between mb-4">
+        <div class="stat-icon">
+          <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+        </div>
+        <span class="stat-badge blue">Top 10% on campus</span>
+      </div>
+      <p class="text-[10px] font-black tracking-[.15em] uppercase text-gray-500 mb-2">
+        Students Helped
+      </p>
+      <p class="font-black text-4xl mb-1" id="students-counter">0</p>
+      <p class="text-gray-400 text-xs font-semibold">Unique customers</p>
+    </div>
+
+    <!-- Gifts Given -->
+    <div class="stat-card gifts">
+      <div class="flex items-start justify-between mb-4">
+        <div class="stat-icon">
+          <i data-lucide="gift" class="w-5 h-5"></i>
+        </div>
+        <span class="stat-badge yellow">Karma Booster!</span>
+      </div>
+      <p class="text-[10px] font-black tracking-[.15em] uppercase text-gray-500 mb-2">
+        Gifts Given
+      </p>
+      <p class="font-black text-4xl mb-1" id="gifts-counter">0</p>
+      <p class="text-gray-400 text-xs font-semibold">Free books donated</p>
+    </div>
+  </div>
+
+  <!-- ── BOTTOM GRID: Recent Customers + Rewards Store ── -->
+  <div class="grid md:grid-cols-[1fr_420px] gap-8">
+
+    <!-- Recent Customers -->
+    <div id="db-customers">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="section-title">Recent Customers</h3>
+        <a href="#"
+           class="text-red-500 font-bold text-sm flex items-center gap-1
+                  hover:gap-2 transition-all cursor-none">
+          View All History
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </a>
+      </div>
+
+      <div class="customers-card">
+
+        <!-- Row 1 -->
+        <div class="customer-row">
+          <div class="customer-avatar bg-gradient-to-br from-orange-300 to-rose-400">
+            <span class="text-white">SJ</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="font-bold text-sm">Sarah J.</p>
+            <p class="text-gray-400 text-xs truncate">
+              Bought <span class="text-black font-semibold">Chemistry: The Central Science</span>
+            </p>
+          </div>
+          <div class="text-right flex-shrink-0">
+            <p class="transaction-positive">+$45.00</p>
+            <p class="text-gray-400 text-xs">2h ago</p>
+          </div>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="customer-row">
+          <div class="customer-avatar bg-gradient-to-br from-sky-300 to-indigo-400">
+            <span class="text-white">MS</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="font-bold text-sm">Mark S.</p>
+            <p class="text-gray-400 text-xs truncate">
+              Received
+              <span class="text-yellow-600 font-semibold">Intro to Physics (Gift)</span>
+            </p>
+          </div>
+          <div class="text-right flex-shrink-0">
+            <p class="transaction-kp">+50 KP</p>
+            <p class="text-gray-400 text-xs">1d ago</p>
+          </div>
+        </div>
+
+        <!-- Row 3 -->
+        <div class="customer-row">
+          <div class="customer-avatar bg-gradient-to-br from-emerald-300 to-teal-500">
+            <span class="text-white">AM</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="font-bold text-sm">Alex M.</p>
+            <p class="text-gray-400 text-xs truncate">
+              Bought <span class="text-black font-semibold">Calculus Early Transcendentals</span>
+            </p>
+          </div>
+          <div class="text-right flex-shrink-0">
+            <p class="transaction-positive">+$80.00</p>
+            <p class="text-gray-400 text-xs">3d ago</p>
+          </div>
+        </div>
+
+        <!-- Row 4 -->
+        <div class="customer-row">
+          <div class="customer-avatar bg-gradient-to-br from-violet-300 to-purple-500"
+               style="font-size:.75rem;">
+            <span class="text-white font-black">JD</span>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="font-bold text-sm">Jane D.</p>
+            <p class="text-gray-400 text-xs truncate">
+              Bought <span class="text-black font-semibold">Art History Vol. 1</span>
+            </p>
+          </div>
+          <div class="text-right flex-shrink-0">
+            <p class="transaction-positive">+$35.00</p>
+            <p class="text-gray-400 text-xs">5d ago</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Rewards Store + KP Promo -->
+    <div id="db-rewards">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="section-title">
+          Rewards Store 🔒
+        </h3>
+        <button class="btn-redeem" id="btn-redeem">Redeem KP</button>
+      </div>
+
+      <!-- Reward Items -->
+      <div class="flex flex-col gap-3 mb-4">
+
+        <div class="reward-card">
+          <div class="reward-icon">
+            <i data-lucide="shield-check" class="w-6 h-6 text-gray-500"></i>
+          </div>
+          <div class="flex-1">
+            <p class="font-bold text-sm">"Trusted Seller" Badge</p>
+            <p class="text-gray-400 text-xs">Show off on your profile</p>
+            <span class="kp-tag">500 KP</span>
+          </div>
+        </div>
+
+        <div class="reward-card">
+          <div class="reward-icon">
+            <i data-lucide="sparkles" class="w-6 h-6 text-gray-500"></i>
+          </div>
+          <div class="flex-1">
+            <p class="font-bold text-sm">Listing Highlight</p>
+            <p class="text-gray-400 text-xs">Boost your book for 24h</p>
+            <span class="kp-tag">200 KP</span>
+          </div>
+        </div>
+
+        <div class="reward-card">
+          <div class="reward-icon">
+            <i data-lucide="palette" class="w-6 h-6 text-gray-500"></i>
+          </div>
+          <div class="flex-1">
+            <p class="font-bold text-sm">Retro Profile Theme</p>
+            <p class="text-gray-400 text-xs">Unlock 80s neon style</p>
+            <span class="kp-tag">1000 KP</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Want More KP Promo Card -->
+      <div class="kp-promo-card" id="kp-promo">
+        <h4 class="font-black text-white text-lg mb-2">Want more KP?</h4>
+        <p class="text-gray-400 text-sm font-medium mb-5 leading-relaxed">
+          Give away a book for free and earn double<br/>karma points this week!
+        </p>
+        <button class="btn-list-free" id="btn-list-free">LIST A FREE BOOK</button>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- Footer (injected) -->
+<div id="site-footer"></div>
+
+
+<!-- ═══════════════════ SCRIPTS ═══════════════════ -->
+<script src="/assets/js/core.js"></script>
+
+<script>
+  CC.loadComponent('#site-header', '/components/header.html');
+  CC.loadComponent('#site-footer', '/components/footer.html');
+  CC.initComponents();
+</script>
+
+<script>
+document.addEventListener('cc:ready', function () {
+
+  // ── 1. Entrance animations ───────────────────────────────
+  const tl = gsap.timeline({ defaults: { ease: 'back.out(1.4)' } });
+
+  tl.from('#db-greeting', { x: -40, opacity: 0, duration: 0.7 })
+    .from('#db-rank-card', { x: 40,  opacity: 0, duration: 0.7 }, '-=0.5')
+    .from('#db-stats .stat-card', {
+      y: 40, opacity: 0, duration: 0.6,
+      stagger: 0.12, ease: 'back.out(1.7)',
+    }, '-=0.3');
+
+  // ── 2. KP Counter animation ──────────────────────────────
+  const kpTarget = parseInt(document.body.dataset.kp || '1240', 10);
+  gsap.to({ val: 0 }, {
+    val: kpTarget,
+    duration: 1.8,
+    ease: 'power2.out',
+    delay: 0.4,
+    onUpdate: function () {
+      const el = document.getElementById('kp-counter');
+      if (el) el.textContent = Math.round(this.targets()[0].val).toLocaleString();
+    }
+  });
+
+  // ── 3. Earnings counter ──────────────────────────────────
+  gsap.to({ val: 0 }, {
+    val: 482.50,
+    duration: 1.6,
+    ease: 'power2.out',
+    delay: 0.6,
+    onUpdate: function () {
+      const el = document.getElementById('earnings-counter');
+      if (el) el.textContent = '$' + this.targets()[0].val.toFixed(2);
+    }
+  });
+
+  // ── 4. Students helped counter ───────────────────────────
+  gsap.to({ val: 0 }, {
+    val: 24,
+    duration: 1.4,
+    ease: 'power2.out',
+    delay: 0.7,
+    onUpdate: function () {
+      const el = document.getElementById('students-counter');
+      if (el) el.textContent = Math.round(this.targets()[0].val);
+    }
+  });
+
+  // ── 5. Gifts counter ─────────────────────────────────────
+  gsap.to({ val: 0 }, {
+    val: 3,
+    duration: 1.2,
+    ease: 'power2.out',
+    delay: 0.8,
+    onUpdate: function () {
+      const el = document.getElementById('gifts-counter');
+      if (el) el.textContent = Math.round(this.targets()[0].val);
+    }
+  });
+
+  // ── 6. Progress bar fill (1240 / 1600 = 77.5%) ──────────
+  gsap.to('#progress-fill', {
+    width: '77.5%',
+    duration: 1.6,
+    ease: 'power3.out',
+    delay: 0.5,
+  });
+
+  // ── 7. Scroll reveals ────────────────────────────────────
+  CC.scrollReveal('#db-customers .customers-card', {
+    y: 30, opacity: 0, duration: 0.6, stagger: 0,
+  });
+
+  gsap.from('.reward-card', {
+    y: 25, opacity: 0, duration: 0.5,
+    stagger: 0.1, ease: 'back.out(1.5)',
+    scrollTrigger: { trigger: '.reward-card', start: 'top 88%' },
+  });
+
+  gsap.from('#kp-promo', {
+    y: 30, opacity: 0, duration: 0.6, ease: 'back.out(1.5)',
+    scrollTrigger: { trigger: '#kp-promo', start: 'top 90%' },
+  });
+
+  // ── 8. Reward card hover ──────────────────────────────────
+  document.querySelectorAll('.reward-card').forEach(card => {
+    card.addEventListener('mouseenter', () =>
+      gsap.to(card, { x: -3, y: -3, duration: 0.2, ease: 'power2.out' })
+    );
+    card.addEventListener('mouseleave', () =>
+      gsap.to(card, { x: 0, y: 0, duration: 0.3, ease: 'elastic.out(1, 0.5)' })
+    );
+  });
+
+  // ── 9. Stat card hover ───────────────────────────────────
+  document.querySelectorAll('.stat-card').forEach(card => {
+    card.addEventListener('mouseenter', () =>
+      gsap.to(card, { y: -4, duration: 0.2, ease: 'power2.out' })
+    );
+    card.addEventListener('mouseleave', () =>
+      gsap.to(card, { y: 0, duration: 0.3, ease: 'elastic.out(1, 0.5)' })
+    );
+  });
+
+  // ── 10. Customer row hover ───────────────────────────────
+  document.querySelectorAll('.customer-row').forEach(row => {
+    row.addEventListener('mouseenter', () =>
+      gsap.to(row, { x: 4, duration: 0.2, ease: 'power2.out' })
+    );
+    row.addEventListener('mouseleave', () =>
+      gsap.to(row, { x: 0, duration: 0.3, ease: 'elastic.out(1, 0.5)' })
+    );
+  });
+
+  // ── 11. Magnetic buttons ─────────────────────────────────
+  CC.makeMagnetic('#btn-redeem',    0.35);
+  CC.makeMagnetic('#btn-list-free', 0.3);
+
+  // ── 12. KP promo card subtle float ───────────────────────
+  gsap.to('#kp-promo', {
+    y: -5,
+    duration: 2.5,
+    ease: 'sine.inOut',
+    repeat: -1,
+    yoyo: true,
+  });
+
+});
+</script>
+</body>
+</html>
