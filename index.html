@@ -237,6 +237,18 @@
       position: relative;
     }
 
+    .students-img-wrap img {
+     width: 100%;
+     height: 100%;
+     object-fit: cover;
+     filter: grayscale(100%) contrast(1.1);
+     transition: filter 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .students-img-wrap:hover img {
+     filter: grayscale(0%) contrast(1);
+    }
+
     /* ── CTA Section ── */
     .cta-section {
       background: linear-gradient(135deg, #fecdd3 0%, #ffe4e6 50%, #fef3c7 100%);
@@ -565,42 +577,11 @@
 
     <!-- Student Image -->
     <div class="students-img-wrap reveal" style="aspect-ratio: 4/3; overflow: hidden;">
-      <svg viewBox="0 0 600 450" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
-        <rect width="600" height="450" fill="#e5e5e5"/>
-        <!-- Sky -->
-        <rect width="600" height="200" fill="#d4d4d4"/>
-        <!-- Building/stairs suggestion -->
-        <rect x="0" y="200" width="600" height="250" fill="#c4c4c4"/>
-        <rect x="100" y="160" width="400" height="200" fill="#bdbdbd"/>
-        <!-- Steps -->
-        <rect x="80" y="350" width="440" height="15" fill="#b0b0b0"/>
-        <rect x="90" y="340" width="420" height="12" fill="#b8b8b8"/>
-        <rect x="100" y="330" width="400" height="12" fill="#c0c0c0"/>
-        <!-- Group of people silhouettes -->
-        <g fill="#555">
-          <ellipse cx="180" cy="295" rx="18" ry="22"/>
-          <rect x="165" y="315" width="30" height="45" rx="4"/>
-          <ellipse cx="230" cy="288" rx="16" ry="20"/>
-          <rect x="216" y="306" width="28" height="48" rx="4"/>
-          <ellipse cx="278" cy="285" rx="17" ry="21"/>
-          <rect x="264" y="304" width="28" height="50" rx="4"/>
-          <ellipse cx="326" cy="287" rx="17" ry="21"/>
-          <rect x="312" y="306" width="28" height="48" rx="4"/>
-          <ellipse cx="374" cy="290" rx="16" ry="20"/>
-          <rect x="360" y="308" width="28" height="46" rx="4"/>
-          <ellipse cx="420" cy="293" rx="17" ry="21"/>
-          <rect x="406" y="312" width="28" height="44" rx="4"/>
-        </g>
-        <!-- Trees suggestion -->
-        <ellipse cx="60" cy="200" rx="40" ry="60" fill="#a0a0a0"/>
-        <ellipse cx="540" cy="190" rx="45" ry="65" fill="#a8a8a8"/>
-        <!-- Photo grain overlay -->
-        <rect width="600" height="450" fill="url(#grain)" opacity="0.1"/>
-        <defs>
-          <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="4" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
-        </defs>
-      </svg>
-    </div>
+  <img 
+    src="/campus-connect/Assets/stud.jpg" 
+    alt="Students on campus"
+  />
+</div>
 
   </div>
 </section>
