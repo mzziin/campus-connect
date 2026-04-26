@@ -40,7 +40,7 @@ $stmt->execute([$user_id]);
 $my_books = $stmt->fetchAll();
 
 // Get user's conversations
-$stmt = $pdo->prepare("SELECT cv.*, b.title AS book_title, 
+$stmt = $pdo->prepare("SELECT cv.*, b.title AS book_title,
        seller.full_name AS seller_name,
        buyer.full_name AS buyer_name
 FROM conversations cv
@@ -51,6 +51,19 @@ WHERE (cv.seller_id = ? OR cv.buyer_id = ?)
 ORDER BY cv.created_at DESC");
 $stmt->execute([$user_id, $user_id]);
 $conversations = $stmt->fetchAll();
+
+// Get user's transactions
+$stmt = $pdo->prepare("SELECT t.*, b.title AS book_title,
+       seller.full_name AS seller_name,
+       buyer.full_name AS buyer_name
+FROM transactions t
+JOIN books b ON t.book_id = b.id
+JOIN users seller ON t.seller_id = seller.id
+JOIN users buyer ON t.buyer_id = buyer.id
+WHERE (t.seller_id = ? OR t.buyer_id = ?)
+ORDER BY t.completed_at DESC");
+$stmt->execute([$user_id, $user_id]);
+$transactions = $stmt->fetchAll();
 
 $page_title = 'Dashboard — Campus Connect';
 ?>
@@ -207,6 +220,74 @@ $page_title = 'Dashboard — Campus Connect';
                                             class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-1.5 px-3 rounded transition-colors">
                                             Open Chat
                                         </a>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php endif; ?>
+        </div>
+
+        <!-- Section: My Transactions -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm mt-6">
+            <div class="p-6 border-b border-gray-100">
+                <h2 class="text-lg font-semibold text-gray-900">My Transactions</h2>
+            </div>
+            <?php if (empty($transactions)): ?>
+                <div class="p-8 text-center text-gray-500">
+                    <p>No transactions yet.</p>
+                </div>
+            <?php else: ?>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Book</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Other Party</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Completed At</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rating</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <?php foreach ($transactions as $txn): ?>
+                                <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm font-medium text-gray-900"><?= e($txn['book_title']) ?></div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <div class="text-sm text-gray-900">
+                                            <?= $txn['seller_id'] == $user_id ? e($txn['buyer_name']) : e($txn['seller_name']) ?>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full <?= get_transaction_status_badge_class($txn['status']) ?>">
+                                            <?= $txn['status'] === 'in_progress' ? 'In Progress' : 'Completed' ?>
+                                        </span>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                        <?= format_datetime($txn['completed_at']) ?>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        <?php if ($txn['rating']): ?>
+                                            <span class="text-yellow-500"><?= str_repeat('★', $txn['rating']) ?></span>
+                                        <?php else: ?>
+                                            <span class="text-gray-400">Not rated</span>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                        <?php if ($txn['buyer_id'] == $user_id && $txn['status'] === 'in_progress' && $txn['rating'] === null): ?>
+                                            <a href="transaction_review.php?id=<?= $txn['id'] ?>"
+                                                class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-1.5 px-3 rounded transition-colors">
+                                                Review
+                                            </a>
+                                        <?php elseif ($txn['feedback']): ?>
+                                            <span class="text-gray-500 text-xs"><?= e(substr($txn['feedback'], 0, 30)) ?>...</span>
+                                        <?php else: ?>
+                                            <span class="text-gray-400">-</span>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>

@@ -133,6 +133,18 @@ function get_status_badge_class(string $status): string {
 }
 
 /**
+ * Get transaction status badge class
+ */
+function get_transaction_status_badge_class(string $status): string {
+    $classes = [
+        'in_progress' => 'bg-yellow-100 text-yellow-700',
+        'completed' => 'bg-green-100 text-green-700',
+    ];
+
+    return $classes[$status] ?? 'bg-gray-100 text-gray-800';
+}
+
+/**
  * Upload book image
  */
 function upload_book_image(array $file): array {

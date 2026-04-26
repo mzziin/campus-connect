@@ -57,14 +57,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
 // Handle transaction completion
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'complete') {
-    $rating = $_POST['rating'] ?? '';
-    $feedback = $_POST['feedback'] ?? '';
-
     // Validation
     if ($user_id != $conversation['seller_id']) {
         flash('error', 'Only the seller can complete the transaction.');
-    } elseif (!is_numeric($rating) || $rating < 1 || $rating > 5) {
-        flash('error', 'Rating must be between 1 and 5.');
     } elseif ($conversation['status'] !== 'active') {
         flash('error', 'This transaction has already been completed.');
     } else {
@@ -78,15 +73,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             try {
                 $pdo->beginTransaction();
 
-                // Insert transaction
-                $stmt = $pdo->prepare("INSERT INTO transactions (conversation_id, book_id, seller_id, buyer_id, rating, feedback) VALUES (?, ?, ?, ?, ?, ?)");
+                // Insert transaction with null rating/feedback
+                $stmt = $pdo->prepare("INSERT INTO transactions (conversation_id, book_id, seller_id, buyer_id, rating, feedback, status) VALUES (?, ?, ?, ?, NULL, NULL, 'in_progress')");
                 $stmt->execute([
                     $conversation_id,
                     $conversation['book_id'],
                     $conversation['seller_id'],
-                    $conversation['buyer_id'],
-                    $rating,
-                    $feedback ?: null
+                    $conversation['buyer_id']
                 ]);
 
                 // Update book status to sold
@@ -98,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 $stmt->execute([$conversation_id]);
 
                 $pdo->commit();
-                flash('success', 'Transaction completed! Thank you.');
+                flash('success', 'Transaction marked as complete. The buyer can now leave a review.');
             } catch (Exception $e) {
                 $pdo->rollBack();
                 flash('error', 'Something went wrong. Please try again.');
@@ -202,29 +195,12 @@ $page_title = 'Chat — Campus Connect';
             </form>
 
             <!-- Complete Transaction Form (Seller Only) -->
-            <?php if ($user_id == $conversation['seller_id']): ?>
+            <?php if ($user_id == $conversation['seller_id'] && $conversation['status'] === 'active'): ?>
                 <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">Mark Transaction as Complete</h3>
+                    <p class="text-sm text-gray-500 mb-4">After marking complete, the buyer will be able to leave a review.</p>
                     <form method="POST" action="">
                         <input type="hidden" name="action" value="complete">
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Rating</label>
-                            <div class="flex gap-2">
-                                <?php for ($i = 1; $i <= 5; $i++): ?>
-                                    <label class="cursor-pointer">
-                                        <input type="radio" name="rating" value="<?= $i ?>" class="hidden peer" required>
-                                        <span class="text-2xl text-gray-300 peer-checked:text-yellow-400 peer-checked:scale-110 transition-transform">★</span>
-                                    </label>
-                                <?php endfor; ?>
-                            </div>
-                        </div>
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Feedback (optional)</label>
-                            <textarea name="feedback" rows="3"
-                                      class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm
-                                             focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                      placeholder="Share your experience..."></textarea>
-                        </div>
                         <button type="submit" onclick="return confirm('Are you sure you want to complete this transaction? This cannot be undone.')"
                             class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2.5 px-4 rounded-lg transition-colors">
                             Complete Transaction
