@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         flash('error', 'Rating must be between 1 and 5.');
     } else {
         try {
-            $stmt = $pdo->prepare("UPDATE transactions SET rating = ?, feedback = ?, status = 'completed' WHERE id = ?");
+            $stmt = $pdo->prepare("UPDATE transactions SET rating = ?, feedback = ? WHERE id = ?");
             $stmt->execute([
                 $rating,
                 $feedback ?: null,

@@ -315,7 +315,7 @@ $page_title = 'Dashboard — Campus Connect';
                                         <?php endif; ?>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                        <?php if ($txn['buyer_id'] == $user_id && $txn['status'] === 'in_progress' && $txn['rating'] === null): ?>
+                                        <?php if ($txn['buyer_id'] == $user_id && $txn['rating'] === null): ?>
                                             <a href="transaction_review.php?id=<?= $txn['id'] ?>"
                                                 class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-1.5 px-3 rounded transition-colors">
                                                 Review
