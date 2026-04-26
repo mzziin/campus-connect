@@ -59,134 +59,302 @@ $page_title = 'Review Reports — Campus Connect';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($page_title) ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --red: #E01B1B; --yellow: #F5C518; --black: #111111; --off-white: #F2F0EB; }
+        * { font-family: 'Barlow Condensed', sans-serif; }
+        .mono { font-family: 'Space Mono', monospace; }
+        body { background-color: var(--off-white); color: var(--black); }
+
+        .btn-primary {
+            background: var(--red);
+            color: #fff;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 6px 16px;
+            border: 2px solid var(--black);
+            box-shadow: 3px 3px 0 var(--black);
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+            display: inline-block;
+            text-decoration: none;
+        }
+        .btn-primary:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 4px 4px 0 var(--black);
+        }
+        .btn-primary:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0 var(--black);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--black);
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 6px 16px;
+            border: 2px solid var(--black);
+            cursor: pointer;
+            transition: background 0.15s;
+            display: inline-block;
+            text-decoration: none;
+        }
+        .btn-ghost:hover { background: #e5e3de; }
+
+        .btn-secondary {
+            background: var(--yellow);
+            color: var(--black);
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.85rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 6px 16px;
+            border: 2px solid var(--black);
+            box-shadow: 3px 3px 0 var(--black);
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+            display: inline-block;
+            text-decoration: none;
+        }
+        .btn-secondary:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 4px 4px 0 var(--black);
+        }
+
+        .card {
+            background: #fff;
+            border: 2px solid var(--black);
+            box-shadow: 4px 4px 0 var(--black);
+        }
+
+        .page-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 900;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: -0.01em;
+            line-height: 1;
+        }
+
+        .section-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 2px solid var(--black);
+            padding-bottom: 6px;
+            margin-bottom: 16px;
+        }
+
+        .badge {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 3px 8px;
+            border: 1.5px solid currentColor;
+            display: inline-block;
+        }
+        .badge-green  { color: #16a34a; border-color: #16a34a; background: #f0fdf4; }
+        .badge-red    { color: var(--red); border-color: var(--red); background: #fef2f2; }
+        .badge-yellow { color: #92400e; border-color: #f59e0b; background: #fffbeb; }
+        .badge-blue   { color: #1d4ed8; border-color: #3b82f6; background: #eff6ff; }
+        .badge-gray   { color: #374151; border-color: #6b7280; background: #f9fafb; }
+        .badge-purple { color: #7c3aed; border-color: #8b5cf6; background: #f5f3ff; }
+
+        .flash-success { background: #f0fdf4; border: 2px solid #16a34a; color: #15803d; padding: 12px 16px; }
+        .flash-error   { background: #fef2f2; border: 2px solid var(--red); color: var(--red); padding: 12px 16px; }
+        .flash-warning { background: #fffbeb; border: 2px solid #f59e0b; color: #92400e; padding: 12px 16px; }
+        .flash-info    { background: #eff6ff; border: 2px solid #3b82f6; color: #1d4ed8; padding: 12px 16px; }
+
+        .nav-link {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.95rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #ccc;
+            text-decoration: none;
+            padding: 4px 0;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.15s;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: var(--red);
+            border-bottom-color: var(--red);
+        }
+
+        .filter-btn {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            padding: 6px 14px;
+            border: 2px solid var(--black);
+            cursor: pointer;
+            transition: all 0.15s;
+            display: inline-block;
+            text-decoration: none;
+        }
+        .filter-btn:hover { background: #e5e3de; }
+        .filter-btn.active {
+            background: var(--red);
+            color: #fff;
+        }
+    </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
-    <nav class="bg-white shadow-sm border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
-            <a href="index.php" class="text-xl font-bold text-blue-600">📚 Campus Connect Admin</a>
+<body>
+    <!-- Navigation -->
+    <nav style="background:#111; border-bottom: 3px solid var(--red);">
+        <div class="max-w-7xl mx-auto px-4 flex items-center justify-between" style="height:60px;">
+            <!-- Logo -->
+            <a href="index.php" class="flex items-center gap-2" style="text-decoration:none;">
+                <div style="background:var(--yellow); width:32px; height:32px; display:flex; align-items:center; justify-content:center; font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:1.1rem; color:#111; border:2px solid #fff;">A</div>
+                <span style="font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:1.1rem; letter-spacing:0.1em; text-transform:uppercase; color:#fff;">Campus Connect Admin</span>
+            </a>
+
+            <!-- Desktop Nav -->
+            <div class="hidden md:flex items-center gap-6">
+                <?php
+                $current_page = basename($_SERVER['PHP_SELF']);
+                $is_active = function($page) use ($current_page) {
+                    return $current_page === $page ? 'color:var(--red);' : 'color:#ccc;';
+                };
+                ?>
+                <a href="index.php" style="color:#ccc;" class="nav-link hover:text-white transition-colors">Dashboard</a>
+                <a href="users.php" style="color:#ccc;" class="nav-link hover:text-white transition-colors">Users</a>
+                <a href="books.php" style="color:#ccc;" class="nav-link hover:text-white transition-colors">Books</a>
+                <a href="reports.php" style="<?= $is_active('reports.php') ?>" class="nav-link">Reports</a>
+                <div style="width:1px; height:20px; background:#444;"></div>
+                <span class="mono" style="font-size:0.85rem; color:#aaa;"><?= e($_SESSION['admin_username']) ?></span>
+                <a href="logout.php" class="btn-ghost" style="color:#ccc; border-color:#555;">Logout</a>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
             <input type="checkbox" id="mobile-menu" class="hidden peer">
-            <label for="mobile-menu" class="md:hidden cursor-pointer text-gray-600">
+            <label for="mobile-menu" class="md:hidden cursor-pointer" style="color:#fff;">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                 </svg>
             </label>
-            <div class="hidden md:flex items-center gap-6">
-                <a href="index.php" class="text-gray-700 hover:text-blue-600 font-medium">Dashboard</a>
-                <a href="users.php" class="text-gray-700 hover:text-blue-600 font-medium">Users</a>
-                <a href="books.php" class="text-gray-700 hover:text-blue-600 font-medium">Books</a>
-                <a href="reports.php" class="text-blue-600 hover:text-blue-700 font-medium">Reports</a>
-                <span class="text-gray-300">|</span>
-                <span class="text-sm text-gray-600"><?= e($_SESSION['admin_username']) ?></span>
-                <a href="logout.php" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors">Logout</a>
-            </div>
-            <div class="hidden peer-checked:block absolute top-16 left-0 right-0 bg-white border-b border-gray-200 p-4 md:hidden">
-                <a href="index.php" class="block py-2 text-gray-700 hover:text-blue-600">Dashboard</a>
-                <a href="users.php" class="block py-2 text-gray-700 hover:text-blue-600">Users</a>
-                <a href="books.php" class="block py-2 text-gray-700 hover:text-blue-600">Books</a>
-                <a href="reports.php" class="block py-2 text-gray-700 hover:text-blue-600">Reports</a>
-                <a href="logout.php" class="block py-2 text-gray-700 hover:text-blue-600">Logout</a>
-            </div>
+        </div>
+
+        <!-- Mobile Nav -->
+        <div class="hidden peer-checked:block md:hidden" style="border-top:2px solid #333; background:#1a1a1a; padding:16px;">
+            <a href="index.php" class="block py-2" style="font-family:'Barlow Condensed',sans-serif; font-weight:700; text-transform:uppercase; color:#ccc; text-decoration:none;">Dashboard</a>
+            <a href="users.php" class="block py-2" style="font-family:'Barlow Condensed',sans-serif; font-weight:700; text-transform:uppercase; color:#ccc; text-decoration:none;">Users</a>
+            <a href="books.php" class="block py-2" style="font-family:'Barlow Condensed',sans-serif; font-weight:700; text-transform:uppercase; color:#ccc; text-decoration:none;">Books</a>
+            <a href="reports.php" class="block py-2" style="font-family:'Barlow Condensed',sans-serif; font-weight:700; text-transform:uppercase; color:var(--red); text-decoration:none;">Reports</a>
+            <a href="logout.php" class="block py-2" style="font-family:'Barlow Condensed',sans-serif; font-weight:700; text-transform:uppercase; color:#e87676; text-decoration:none;">Logout</a>
         </div>
     </nav>
 
     <main class="max-w-7xl mx-auto px-4 py-8">
         <?php $flash = get_flash(); ?>
         <?php if ($flash): ?>
-            <div class="mb-6 px-4 py-3 rounded-lg border <?php
-                echo match($flash['type']) {
-                    'success' => 'bg-green-50 border-green-200 text-green-800',
-                    'error'   => 'bg-red-50 border-red-200 text-red-800',
-                    'warning' => 'bg-yellow-50 border-yellow-200 text-yellow-800',
-                    default   => 'bg-blue-50 border-blue-200 text-blue-800',
-                };
-            ?>">
+            <div class="<?= match($flash['type']) { 'success' => 'flash-success', 'error' => 'flash-error', 'warning' => 'flash-warning', default => 'flash-info' } ?> mb-6">
                 <?= e($flash['message']) ?>
             </div>
         <?php endif; ?>
 
-        <h1 class="text-2xl font-bold text-gray-900 mb-6">Review Reports</h1>
+        <div class="mb-8">
+            <h1 class="page-title mb-2">Review Reports</h1>
+            <div style="width: 40px; height: 3px; background: var(--red);"></div>
+            <p class="mono mt-3" style="font-size: 0.8rem; color: #666;">Review and manage user reports.</p>
+        </div>
 
         <!-- Filter -->
-        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 mb-6">
-            <div class="flex flex-wrap gap-2">
-                <span class="text-sm text-gray-500 self-center mr-2">Filter by status:</span>
-                <a href="reports.php" class="<?= $status_filter === '' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' ?> px-4 py-2 rounded-full text-sm font-medium transition-colors">All</a>
-                <a href="reports.php?status=pending" class="<?= $status_filter === 'pending' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' ?> px-4 py-2 rounded-full text-sm font-medium transition-colors">Pending</a>
-                <a href="reports.php?status=reviewed" class="<?= $status_filter === 'reviewed' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' ?> px-4 py-2 rounded-full text-sm font-medium transition-colors">Reviewed</a>
-                <a href="reports.php?status=dismissed" class="<?= $status_filter === 'dismissed' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200' ?> px-4 py-2 rounded-full text-sm font-medium transition-colors">Dismissed</a>
+        <div class="card p-4 mb-6">
+            <div class="flex flex-wrap items-center gap-3">
+                <span class="mono" style="font-size: 0.75rem; color: #666; text-transform: uppercase; letter-spacing: 0.05em;">Filter by status:</span>
+                <a href="reports.php" class="filter-btn <?= $status_filter === '' ? 'active' : '' ?>">All</a>
+                <a href="reports.php?status=pending" class="filter-btn <?= $status_filter === 'pending' ? 'active' : '' ?>">Pending</a>
+                <a href="reports.php?status=reviewed" class="filter-btn <?= $status_filter === 'reviewed' ? 'active' : '' ?>">Reviewed</a>
+                <a href="reports.php?status=dismissed" class="filter-btn <?= $status_filter === 'dismissed' ? 'active' : '' ?>">Dismissed</a>
             </div>
         </div>
 
         <!-- Reports Table -->
-        <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+        <div class="card overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead class="bg-gray-50">
+                <table class="w-full" style="border-collapse: collapse;">
+                    <thead style="background: #f9fafb; border-bottom: 2px solid var(--black);">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reported Item</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reporter</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reason</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            <th class="px-6 py-3 text-left mono" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: #666;">Type</th>
+                            <th class="px-6 py-3 text-left mono" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: #666;">Reported Item</th>
+                            <th class="px-6 py-3 text-left mono" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: #666;">Reporter</th>
+                            <th class="px-6 py-3 text-left mono" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: #666;">Reason</th>
+                            <th class="px-6 py-3 text-left mono" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: #666;">Status</th>
+                            <th class="px-6 py-3 text-left mono" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: #666;">Date</th>
+                            <th class="px-6 py-3 text-left mono" style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.05em; color: #666;">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100">
+                    <tbody style="border-bottom: 1px solid #e5e7eb;">
                         <?php foreach ($reports as $report): ?>
-                            <tr>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 py-1 text-xs font-medium rounded-full 
-                                        <?= $report['report_type'] === 'book' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700' ?>">
+                            <tr style="border-bottom: 1px solid #e5e7eb;">
+                                <td class="px-6 py-4">
+                                    <span class="badge 
+                                        <?= $report['report_type'] === 'book' ? 'badge-blue' : 'badge-purple' ?>">
                                         <?= ucfirst(e($report['report_type'])) ?>
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-900">
+                                <td class="px-6 py-4">
+                                    <div style="font-weight: 600; font-size: 0.9rem;">
                                         <?= $report['report_type'] === 'book' ? e($report['book_title'] ?? 'N/A') : e($report['reported_user_name'] ?? 'N/A') ?>
                                     </div>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <div class="text-sm text-gray-500"><?= e($report['reporter_name']) ?></div>
+                                <td class="px-6 py-4">
+                                    <div style="font-size: 0.9rem; color: #666;"><?= e($report['reporter_name']) ?></div>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <div class="text-sm text-gray-900"><?= e($report['reason']) ?></div>
+                                    <div style="font-weight: 600; font-size: 0.9rem;"><?= e($report['reason']) ?></div>
                                     <?php if ($report['details']): ?>
-                                        <div class="text-xs text-gray-500 mt-1"><?= e(truncate($report['details'], 50)) ?></div>
+                                        <div class="mono" style="font-size: 0.75rem; color: #999; margin-top: 4px;"><?= e(truncate($report['details'], 50)) ?></div>
                                     <?php endif; ?>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 py-1 text-xs font-medium rounded-full 
+                                <td class="px-6 py-4">
+                                    <span class="badge 
                                         <?= match($report['status']) {
-                                            'pending' => 'bg-yellow-100 text-yellow-700',
-                                            'reviewed' => 'bg-blue-100 text-blue-700',
-                                            'dismissed' => 'bg-gray-100 text-gray-700',
-                                            default => 'bg-gray-100 text-gray-700',
+                                            'pending' => 'badge-yellow',
+                                            'reviewed' => 'badge-blue',
+                                            'dismissed' => 'badge-gray',
+                                            default => 'badge-gray',
                                         } ?>">
                                         <?= ucfirst(e($report['status'])) ?>
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <td class="px-6 py-4 mono" style="font-size: 0.8rem; color: #666;">
                                     <?= format_date($report['created_at']) ?>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                <td class="px-6 py-4">
                                     <?php if ($report['status'] === 'pending'): ?>
                                         <div class="flex gap-2">
                                             <form method="POST" action="" class="inline">
                                                 <input type="hidden" name="action" value="review">
                                                 <input type="hidden" name="report_id" value="<?= $report['id'] ?>">
-                                                <button type="submit" onclick="return confirm('Mark this report as reviewed?')"
-                                                    class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium py-1.5 px-3 rounded transition-colors">Review</button>
+                                                <button type="submit" onclick="return confirm('Mark this report as reviewed?')" class="btn-primary">Review</button>
                                             </form>
                                             <form method="POST" action="" class="inline">
                                                 <input type="hidden" name="action" value="dismiss">
                                                 <input type="hidden" name="report_id" value="<?= $report['id'] ?>">
-                                                <button type="submit" onclick="return confirm('Dismiss this report?')"
-                                                    class="bg-gray-600 hover:bg-gray-700 text-white text-xs font-medium py-1.5 px-3 rounded transition-colors">Dismiss</button>
+                                                <button type="submit" onclick="return confirm('Dismiss this report?')" class="btn-secondary">Dismiss</button>
                                             </form>
                                         </div>
                                     <?php else: ?>
-                                        <span class="text-gray-400">-</span>
+                                        <span class="mono" style="font-size: 0.75rem; color: #999;">-</span>
                                     <?php endif; ?>
                                 </td>
                             </tr>
@@ -196,7 +364,7 @@ $page_title = 'Review Reports — Campus Connect';
             </div>
 
             <?php if (empty($reports)): ?>
-                <div class="p-12 text-center text-gray-500">No reports found.</div>
+                <div class="p-12 text-center mono" style="font-size: 0.8rem; color: #666;">No reports found.</div>
             <?php endif; ?>
         </div>
     </main>
