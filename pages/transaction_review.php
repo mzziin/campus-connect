@@ -109,11 +109,11 @@ $page_title = 'Review Transaction — Campus Connect';
             <form method="POST" action="">
                 <div class="mb-6">
                     <label class="block text-sm font-medium text-gray-700 mb-3">Rating</label>
-                    <div class="flex gap-2">
+                    <div class="flex gap-2" id="star-rating">
                         <?php for ($i = 1; $i <= 5; $i++): ?>
-                            <label class="cursor-pointer">
+                            <label class="cursor-pointer group">
                                 <input type="radio" name="rating" value="<?= $i ?>" class="hidden peer" required>
-                                <span class="text-3xl text-gray-300 peer-checked:text-yellow-400 peer-checked:scale-110 transition-transform">★</span>
+                                <span class="star text-3xl text-gray-300 peer-checked:text-yellow-400 peer-checked:scale-110 transition-transform group-hover:text-yellow-300" data-value="<?= $i ?>">★</span>
                             </label>
                         <?php endfor; ?>
                     </div>
@@ -140,5 +140,59 @@ $page_title = 'Review Transaction — Campus Connect';
     </main>
 
     <?php require_once '../includes/footer.php'; ?>
+
+    <script>
+        const starRating = document.getElementById('star-rating');
+        const stars = starRating.querySelectorAll('.star');
+        const inputs = starRating.querySelectorAll('input');
+
+        stars.forEach((star, index) => {
+            const value = parseInt(star.dataset.value);
+
+            // Hover effect
+            star.addEventListener('mouseenter', () => {
+                stars.forEach((s, i) => {
+                    if (i < value) {
+                        s.classList.remove('text-gray-300');
+                        s.classList.add('text-yellow-300');
+                    } else {
+                        s.classList.remove('text-yellow-300');
+                        s.classList.add('text-gray-300');
+                    }
+                });
+            });
+        });
+
+        starRating.addEventListener('mouseleave', () => {
+            const selectedValue = parseInt(starRating.querySelector('input:checked')?.value || 0);
+            stars.forEach((s, i) => {
+                const starValue = parseInt(s.dataset.value);
+                if (starValue <= selectedValue) {
+                    s.classList.remove('text-gray-300');
+                    s.classList.add('text-yellow-400');
+                } else {
+                    s.classList.remove('text-yellow-400', 'text-yellow-300');
+                    s.classList.add('text-gray-300');
+                }
+            });
+        });
+
+        // On selection
+        inputs.forEach(input => {
+            input.addEventListener('change', () => {
+                const selectedValue = parseInt(input.value);
+                stars.forEach((s, i) => {
+                    const starValue = parseInt(s.dataset.value);
+                    if (starValue <= selectedValue) {
+                        s.classList.remove('text-gray-300');
+                        s.classList.add('text-yellow-400');
+                    } else {
+                        s.classList.remove('text-yellow-400', 'text-yellow-300');
+                        s.classList.add('text-gray-300');
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
