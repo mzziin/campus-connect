@@ -98,6 +98,10 @@ $page_title = 'Register — Campus Connect';
             flex-direction: column;
             justify-content: space-between;
             min-height: 100%;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow: hidden;
         }
 
         .tag-badge {
@@ -131,23 +135,23 @@ $page_title = 'Register — Campus Connect';
             </div>
 
             <div style="font-weight:900; font-size:3.8rem; line-height:0.95; text-transform:uppercase; color:#fff; margin-bottom:24px;">
-                THE<br>STUDENT<br>ZINE IS<br>CALLING.
+                ADMIN<br>PORTAL<br>SYSTEM<br>ACCESS.
             </div>
 
             <p style="font-family:'Space Mono',monospace; font-size:0.85rem; color:rgba(255,255,255,0.8); line-height:1.7; max-width:280px; margin-bottom:32px;">
-                Stop overpaying for textbooks. Start sharing the campus knowledge.
+                Manage the campus book exchange. Oversee users, listings, and reports.
             </p>
 
             <div class="flex flex-col gap-3">
-                <div class="tag-badge">100% Student Verified</div>
-                <div class="tag-badge">Join 5000+ Students</div>
+                <div class="tag-badge">System Administration</div>
+                <div class="tag-badge">Full Control Access</div>
             </div>
         </div>
 
         <!-- Bottom: Decorative text -->
-        <div style="margin-top:auto; padding-top:40px;">
+        <div style="margin-top:32px;">
             <div style="border-top:2px solid rgba(255,255,255,0.2); padding-top:16px; font-family:'Space Mono',monospace; font-size:0.7rem; color:rgba(255,255,255,0.4); letter-spacing:0.08em; text-transform:uppercase;">
-                Authenticity Guaranteed — For Students By Students — Since 2024
+                System Secured — Admin Access Only — Since 2024
             </div>
         </div>
     </div>
@@ -164,10 +168,10 @@ $page_title = 'Register — Campus Connect';
 
             <!-- Header -->
             <div style="margin-bottom:32px;">
-                <div style="font-family:'Space Mono',monospace; font-size:0.7rem; letter-spacing:0.15em; text-transform:uppercase; color:#888; margin-bottom:8px;">Issue No. 04 // Join The Collective</div>
-                <h1 style="font-weight:900; font-size:2.4rem; text-transform:uppercase; line-height:1; color:var(--black); margin-bottom:4px;">Initialize Profile</h1>
+                <div style="font-family:'Space Mono',monospace; font-size:0.7rem; letter-spacing:0.15em; text-transform:uppercase; color:#888; margin-bottom:8px;">Admin Portal // System Setup</div>
+                <h1 style="font-weight:900; font-size:2.4rem; text-transform:uppercase; line-height:1; color:var(--black); margin-bottom:4px;">Create Admin</h1>
                 <div style="width:40px; height:3px; background:var(--red); margin-bottom:12px;"></div>
-                <p style="font-family:'Space Mono',monospace; font-size:0.78rem; color:#666; line-height:1.6;">Create your credentials to access the internal campus exchange network.</p>
+                <p style="font-family:'Space Mono',monospace; font-size:0.78rem; color:#666; line-height:1.6;">Create your credentials to access the administration panel.</p>
             </div>
 
             <!-- Flash -->
@@ -220,11 +224,11 @@ $page_title = 'Register — Campus Connect';
             <div style="margin-top:32px; padding-top:20px; border-top:1px solid #ddd; display:flex; gap:20px; align-items:center;">
                 <div style="display:flex; align-items:center; gap:6px; font-family:'Space Mono',monospace; font-size:0.65rem; color:#888; letter-spacing:0.05em; text-transform:uppercase;">
                     <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:#16a34a;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-                    Secure Enrollment
+                    Secure System
                 </div>
                 <div style="display:flex; align-items:center; gap:6px; font-family:'Space Mono',monospace; font-size:0.65rem; color:#888; letter-spacing:0.05em; text-transform:uppercase;">
                     <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:#2563eb;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                    Edu-Verified Only
+                    Admin Verified
                 </div>
             </div>
 
