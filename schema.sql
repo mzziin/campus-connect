@@ -86,7 +86,7 @@ CREATE TABLE book_inquiries (
 -- Table 8: conversations
 CREATE TABLE conversations (
     id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    inquiry_id  INT UNSIGNED NOT NULL,
+    inquiry_id  INT UNSIGNED NOT NULL UNIQUE,
     book_id     INT UNSIGNED NOT NULL,
     seller_id   INT UNSIGNED NOT NULL,
     buyer_id    INT UNSIGNED NOT NULL,
