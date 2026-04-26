@@ -6,5 +6,5 @@
 INSERT INTO admins (username, email, password_hash) VALUES (
     'admin',
     'admin@campusconnect.local',
-    '$2y$10$PLACEHOLDER_REPLACE_WITH_ACTUAL_BCRYPT_HASH'
+    '$2y$10$HIOmnItgFV9/8j2xzNrCi.KJqSe9/lCkBtBonupN0VIPtJAP3eVH'
 );
