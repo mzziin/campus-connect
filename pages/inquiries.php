@@ -54,11 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt = $pdo->prepare("INSERT INTO conversations (inquiry_id, book_id, seller_id, buyer_id) VALUES (?,?,?,?)");
             $stmt->execute([$inquiry_id, $book_id, $user_id, $inquiry['buyer_id']]);
 
-            // 3. Reserve the book
-            $stmt = $pdo->prepare("UPDATE books SET status='reserved' WHERE id=? AND seller_id=?");
-            $stmt->execute([$book_id, $user_id]);
-
-            // 4. Reject all other pending inquiries for this book
+            // 3. Reject all other pending inquiries for this book
             $stmt = $pdo->prepare("UPDATE book_inquiries SET status='rejected' WHERE book_id=? AND id != ? AND status='pending'");
             $stmt->execute([$book_id, $inquiry_id]);
 

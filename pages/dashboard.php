@@ -11,7 +11,7 @@ $pdo = get_db();
 $user_id = $_SESSION['user_id'];
 
 // Calculate stats
-$active_listings_stmt = $pdo->prepare("SELECT COUNT(*) FROM books WHERE seller_id = ? AND status IN ('available', 'reserved')");
+$active_listings_stmt = $pdo->prepare("SELECT COUNT(*) FROM books WHERE seller_id = ? AND status = 'available'");
 $active_listings_stmt->execute([$user_id]);
 $active_listings = $active_listings_stmt->fetchColumn();
 
@@ -39,17 +39,35 @@ ORDER BY b.created_at DESC");
 $stmt->execute([$user_id]);
 $my_books = $stmt->fetchAll();
 
-// Get user's conversations
-$stmt = $pdo->prepare("SELECT cv.*, b.title AS book_title,
-       seller.full_name AS seller_name,
-       buyer.full_name AS buyer_name
-FROM conversations cv
-JOIN books b ON cv.book_id = b.id
-JOIN users seller ON cv.seller_id = seller.id
-JOIN users buyer ON cv.buyer_id = buyer.id
-WHERE (cv.seller_id = ? OR cv.buyer_id = ?)
-ORDER BY cv.created_at DESC");
-$stmt->execute([$user_id, $user_id]);
+// Get user's conversations and pending inquiries
+$stmt = $pdo->prepare("
+    SELECT cv.id, cv.book_id, cv.seller_id, cv.buyer_id, cv.status, cv.created_at,
+           b.title AS book_title,
+           seller.full_name AS seller_name,
+           buyer.full_name AS buyer_name,
+           'conversation' AS type
+    FROM conversations cv
+    JOIN books b ON cv.book_id = b.id
+    JOIN users seller ON cv.seller_id = seller.id
+    JOIN users buyer ON cv.buyer_id = buyer.id
+    WHERE (cv.seller_id = ? OR cv.buyer_id = ?)
+
+    UNION ALL
+
+    SELECT bi.id, bi.book_id, b.seller_id AS seller_id, bi.buyer_id, bi.status, bi.created_at,
+           b.title AS book_title,
+           seller.full_name AS seller_name,
+           buyer.full_name AS buyer_name,
+           'inquiry' AS type
+    FROM book_inquiries bi
+    JOIN books b ON bi.book_id = b.id
+    JOIN users seller ON b.seller_id = seller.id
+    JOIN users buyer ON bi.buyer_id = buyer.id
+    WHERE bi.buyer_id = ? AND bi.status = 'pending'
+
+    ORDER BY created_at DESC
+");
+$stmt->execute([$user_id, $user_id, $user_id]);
 $conversations = $stmt->fetchAll();
 
 // Get user's transactions
@@ -207,19 +225,38 @@ $page_title = 'Dashboard — Campus Connect';
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm text-gray-900">
-                                            <?= $conv['seller_id'] == $user_id ? e($conv['buyer_name']) : e($conv['seller_name']) ?>
+                                            <?= $conv['type'] === 'inquiry' ? e($conv['seller_name']) : ($conv['seller_id'] == $user_id ? e($conv['buyer_name']) : e($conv['seller_name'])) ?>
                                         </div>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <span class="px-2 py-1 text-xs font-medium rounded-full <?= get_status_badge_class($conv['status']) ?>">
-                                            <?= ucfirst(e($conv['status'])) ?>
-                                        </span>
+                                        <?php if ($conv['type'] === 'inquiry'): ?>
+                                            <span class="px-2 py-1 text-xs font-medium rounded-full <?= get_status_badge_class($conv['status']) ?>">
+                                                <?= ucfirst(e($conv['status'])) ?>
+                                            </span>
+                                        <?php else: ?>
+                                            <span class="px-2 py-1 text-xs font-medium rounded-full <?= get_status_badge_class($conv['status']) ?>">
+                                                <?= ucfirst(e($conv['status'])) ?>
+                                            </span>
+                                        <?php endif; ?>
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
-                                        <a href="chat.php?conversation_id=<?= $conv['id'] ?>" 
-                                            class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-1.5 px-3 rounded transition-colors">
-                                            Open Chat
-                                        </a>
+                                        <?php if ($conv['type'] === 'inquiry'): ?>
+                                            <?php if ($conv['status'] === 'pending'): ?>
+                                                <span class="text-gray-400 text-sm">Pending</span>
+                                            <?php elseif ($conv['status'] === 'accepted'): ?>
+                                                <a href="chat.php?conversation_id=<?= $conv['id'] ?>"
+                                                    class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-1.5 px-3 rounded transition-colors">
+                                                    Open Chat
+                                                </a>
+                                            <?php else: ?>
+                                                <span class="text-gray-400 text-sm">Rejected</span>
+                                            <?php endif; ?>
+                                        <?php else: ?>
+                                            <a href="chat.php?conversation_id=<?= $conv['id'] ?>"
+                                                class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium py-1.5 px-3 rounded transition-colors">
+                                                Open Chat
+                                            </a>
+                                        <?php endif; ?>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
