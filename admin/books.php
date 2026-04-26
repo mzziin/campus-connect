@@ -179,6 +179,8 @@ $page_title = 'Manage Books — Campus Connect';
                                             <button type="submit" onclick="return confirm('Restore this book?')"
                                                 class="bg-green-600 hover:bg-green-700 text-white text-xs font-medium py-1.5 px-3 rounded transition-colors">Restore</button>
                                         </form>
+                                    <?php elseif ($book['status'] === 'sold'): ?>
+                                        <span class="text-gray-400 text-xs">Cannot delete sold books</span>
                                     <?php else: ?>
                                         <form method="POST" action="" class="inline">
                                             <input type="hidden" name="action" value="delete">
