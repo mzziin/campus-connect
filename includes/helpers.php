@@ -25,6 +25,16 @@ function get_flash() {
  * Redirect to a URL
  */
 function redirect($url) {
+    // If URL is relative and doesn't start with / or http, prepend the base path
+    if (!str_starts_with($url, '/') && !str_starts_with($url, 'http')) {
+        // Remove any leading ../ or ./
+        $url = preg_replace('#^\.\.?/#', '', $url);
+        $url = '/campus-connect/' . ltrim($url, '/');
+    }
+    // If URL starts with / but not /campus-connect/, prepend it
+    elseif (str_starts_with($url, '/') && !str_starts_with($url, '/campus-connect/')) {
+        $url = '/campus-connect' . $url;
+    }
     header("Location: $url");
     exit;
 }
