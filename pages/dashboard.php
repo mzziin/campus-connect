@@ -280,6 +280,7 @@ $page_title = 'Dashboard — Campus Connect';
                     <table class="w-full">
                         <thead class="bg-gray-50">
                             <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Book</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Other Party</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
@@ -291,6 +292,11 @@ $page_title = 'Dashboard — Campus Connect';
                         <tbody class="divide-y divide-gray-100">
                             <?php foreach ($transactions as $txn): ?>
                                 <tr>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 text-xs font-medium rounded-full <?= $txn['seller_id'] == $user_id ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700' ?>">
+                                            <?= $txn['seller_id'] == $user_id ? 'Sold' : 'Bought' ?>
+                                        </span>
+                                    </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <div class="text-sm font-medium text-gray-900"><?= e($txn['book_title']) ?></div>
                                     </td>
