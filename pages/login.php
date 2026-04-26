@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             redirect('pending.php');
         } else {
             flash('success', 'Welcome back!');
-            redirect('pages/home.php');
+            redirect('home.php');
         }
     } else {
         flash('error', $result['error']);
