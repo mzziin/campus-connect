@@ -6,5 +6,5 @@
 INSERT INTO admins (username, email, password_hash) VALUES (
     'admin',
     'admin@campusconnect.local',
-    '$2y$10$HIOmnItgFV9/8j2xzNrCi.KJqSe9/lCkBtBonupN0VIPtJAP3eVH'
+    '$2y$10$5HcXi9nKERAR5/DPRNUwruGjuXsn23AtwmV8exnJMJ/RjlXDAwrb6'
 );
