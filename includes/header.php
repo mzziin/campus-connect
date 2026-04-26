@@ -202,11 +202,17 @@ require_once __DIR__ . '/auth.php';
 
             <!-- Desktop Nav -->
             <div class="hidden md:flex items-center gap-6">
+                <?php
+                $current_page = basename($_SERVER['PHP_SELF']);
+                $is_active = function($page) use ($current_page) {
+                    return $current_page === $page ? 'color:var(--red);' : 'color:#ccc;';
+                };
+                ?>
                 <?php if (is_logged_in() && is_approved()): ?>
-                    <a href="home.php" style="font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:0.95rem; letter-spacing:0.08em; text-transform:uppercase; color:#ccc; text-decoration:none;" class="hover:text-white transition-colors">Buy Books</a>
-                    <a href="book_add.php" style="font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:0.95rem; letter-spacing:0.08em; text-transform:uppercase; color:#ccc; text-decoration:none;" class="hover:text-white transition-colors">Sell Books</a>
-                    <a href="inquiries.php" style="font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:0.95rem; letter-spacing:0.08em; text-transform:uppercase; color:#ccc; text-decoration:none;" class="hover:text-white transition-colors">Inquiries</a>
-                    <a href="dashboard.php" style="font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:0.95rem; letter-spacing:0.08em; text-transform:uppercase; color:var(--red); text-decoration:none;">Dashboard</a>
+                    <a href="home.php" style="font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:0.95rem; letter-spacing:0.08em; text-transform:uppercase; text-decoration:none; <?= $is_active('home.php') ?>" class="hover:text-white transition-colors">Buy Books</a>
+                    <a href="book_add.php" style="font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:0.95rem; letter-spacing:0.08em; text-transform:uppercase; text-decoration:none; <?= $is_active('book_add.php') ?>" class="hover:text-white transition-colors">Sell Books</a>
+                    <a href="inquiries.php" style="font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:0.95rem; letter-spacing:0.08em; text-transform:uppercase; text-decoration:none; <?= $is_active('inquiries.php') ?>" class="hover:text-white transition-colors">Inquiries</a>
+                    <a href="dashboard.php" style="font-family:'Barlow Condensed',sans-serif; font-weight:700; font-size:0.95rem; letter-spacing:0.08em; text-transform:uppercase; text-decoration:none; <?= $is_active('dashboard.php') ?>" class="hover:text-white transition-colors">Dashboard</a>
                     <div style="width:1px; height:20px; background:#444;"></div>
                     <div style="position:relative;" id="user-menu-wrap">
                         <button onclick="document.getElementById('user-dropdown').classList.toggle('hidden')" style="background:none; border:none; cursor:pointer; display:flex; align-items:center; gap:8px;">
@@ -241,10 +247,10 @@ require_once __DIR__ . '/auth.php';
         <!-- Mobile Nav -->
         <div class="hidden peer-checked:block md:hidden" style="border-top:2px solid #333; background:#1a1a1a; padding:16px;">
             <?php if (is_logged_in() && is_approved()): ?>
-                <a href="home.php" class="block py-2" style="font-family:'Barlow Condensed',sans-serif; font-weight:700; text-transform:uppercase; color:#ccc; text-decoration:none;">Buy Books</a>
-                <a href="book_add.php" class="block py-2" style="font-family:'Barlow Condensed',sans-serif; font-weight:700; text-transform:uppercase; color:#ccc; text-decoration:none;">Sell Books</a>
-                <a href="inquiries.php" class="block py-2" style="font-family:'Barlow Condensed',sans-serif; font-weight:700; text-transform:uppercase; color:#ccc; text-decoration:none;">Inquiries</a>
-                <a href="dashboard.php" class="block py-2" style="font-family:'Barlow Condensed',sans-serif; font-weight:700; text-transform:uppercase; color:var(--red); text-decoration:none;">Dashboard</a>
+                <a href="home.php" class="block py-2" style="font-family:'Barlow Condensed',sans-serif; font-weight:700; text-transform:uppercase; text-decoration:none; <?= $is_active('home.php') ?>">Buy Books</a>
+                <a href="book_add.php" class="block py-2" style="font-family:'Barlow Condensed',sans-serif; font-weight:700; text-transform:uppercase; text-decoration:none; <?= $is_active('book_add.php') ?>">Sell Books</a>
+                <a href="inquiries.php" class="block py-2" style="font-family:'Barlow Condensed',sans-serif; font-weight:700; text-transform:uppercase; text-decoration:none; <?= $is_active('inquiries.php') ?>">Inquiries</a>
+                <a href="dashboard.php" class="block py-2" style="font-family:'Barlow Condensed',sans-serif; font-weight:700; text-transform:uppercase; text-decoration:none; <?= $is_active('dashboard.php') ?>">Dashboard</a>
                 <a href="logout.php" class="block py-2" style="font-family:'Barlow Condensed',sans-serif; font-weight:700; text-transform:uppercase; color:#e87676; text-decoration:none;">Logout</a>
             <?php elseif (is_logged_in()): ?>
                 <a href="logout.php" class="block py-2" style="font-family:'Barlow Condensed',sans-serif; font-weight:700; text-transform:uppercase; color:#e87676; text-decoration:none;">Logout</a>
