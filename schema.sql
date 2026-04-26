@@ -48,7 +48,7 @@ CREATE TABLE books (
     description     TEXT DEFAULT NULL,
     price           DECIMAL(8,2) DEFAULT NULL,
     listing_type    ENUM('sell','giveaway') NOT NULL DEFAULT 'sell',
-    status          ENUM('available','reserved','sold','deleted') NOT NULL DEFAULT 'available',
+    status          ENUM('available','sold','deleted') NOT NULL DEFAULT 'available',
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
