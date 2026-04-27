@@ -12,13 +12,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
     $confirm_password = $_POST['confirm_password'] ?? '';
+    $phone = $_POST['phone'] ?? '';
+    $department = $_POST['department'] ?? '';
+    $college_id = $_POST['college_id'] ?? '';
 
     if (empty($full_name) || empty($email) || empty($password)) {
         flash('error', 'All fields are required.');
     } elseif ($password !== $confirm_password) {
         flash('error', 'Passwords do not match.');
     } else {
-        $result = register_user($full_name, $email, $password);
+        $result = register_user([
+            'full_name' => $full_name,
+            'email' => $email,
+            'password' => $password,
+            'confirm_password' => $confirm_password,
+            'phone' => $phone,
+            'department' => $department,
+            'college_id' => $college_id
+        ]);
         if ($result['success']) {
             flash('success', 'Account created! Please wait for admin approval.');
             redirect('login.php');
