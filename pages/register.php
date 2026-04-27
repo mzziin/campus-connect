@@ -8,23 +8,23 @@ require_once '../includes/helpers.php';
 redirect_if_logged_in();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $data = [
-        'full_name' => $_POST['full_name'] ?? '',
-        'email' => $_POST['email'] ?? '',
-        'password' => $_POST['password'] ?? '',
-        'confirm_password' => $_POST['confirm_password'] ?? '',
-        'phone' => $_POST['phone'] ?? '',
-        'department' => $_POST['department'] ?? '',
-        'college_id' => $_POST['college_id'] ?? '',
-    ];
+    $full_name = $_POST['full_name'] ?? '';
+    $email = $_POST['email'] ?? '';
+    $password = $_POST['password'] ?? '';
+    $confirm_password = $_POST['confirm_password'] ?? '';
 
-    $result = register_user($data);
-
-    if ($result['success']) {
-        flash('success', 'Registration successful! Wait for admin approval.');
-        redirect('login.php');
+    if (empty($full_name) || empty($email) || empty($password)) {
+        flash('error', 'All fields are required.');
+    } elseif ($password !== $confirm_password) {
+        flash('error', 'Passwords do not match.');
     } else {
-        flash('error', $result['error']);
+        $result = register_user($full_name, $email, $password);
+        if ($result['success']) {
+            flash('success', 'Account created! Please wait for admin approval.');
+            redirect('login.php');
+        } else {
+            flash('error', $result['error']);
+        }
     }
 }
 
