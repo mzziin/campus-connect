@@ -214,25 +214,25 @@ $page_title = 'Admin Dashboard — Campus Connect';
             <div class="stat-card">
                 <p class="mono" style="font-size: 0.75rem; color: #666; text-transform: uppercase; letter-spacing: 0.05em;">Pending Users</p>
                 <p style="font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:2.5rem; line-height:1; margin-top:8px;"><?= $pending_users ?></p>
-                <a href="users.php" style="color:var(--red); text-decoration:none; font-weight:700; font-size:0.8rem; margin-top:12px; display:inline-block;">View Users →</a>
+                <a href="users.php?status=pending" style="color:var(--red); text-decoration:none; font-weight:700; font-size:0.8rem; margin-top:12px; display:inline-block;">View Users →</a>
             </div>
 
             <div class="stat-card highlight">
                 <p class="mono" style="font-size: 0.75rem; color: #666; text-transform: uppercase; letter-spacing: 0.05em;">Approved Users</p>
                 <p style="font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:2.5rem; line-height:1; margin-top:8px;"><?= $approved_users ?></p>
-                <a href="users.php" style="color:var(--red); text-decoration:none; font-weight:700; font-size:0.8rem; margin-top:12px; display:inline-block;">View Users →</a>
+                <a href="users.php?status=approved" style="color:var(--red); text-decoration:none; font-weight:700; font-size:0.8rem; margin-top:12px; display:inline-block;">View Users →</a>
             </div>
 
             <div class="stat-card">
                 <p class="mono" style="font-size: 0.75rem; color: #666; text-transform: uppercase; letter-spacing: 0.05em;">Available Books</p>
                 <p style="font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:2.5rem; line-height:1; margin-top:8px;"><?= $total_books ?></p>
-                <a href="books.php" style="color:var(--red); text-decoration:none; font-weight:700; font-size:0.8rem; margin-top:12px; display:inline-block;">Manage Books →</a>
+                <a href="books.php?status=available" style="color:var(--red); text-decoration:none; font-weight:700; font-size:0.8rem; margin-top:12px; display:inline-block;">Manage Books →</a>
             </div>
 
             <div class="stat-card">
                 <p class="mono" style="font-size: 0.75rem; color: #666; text-transform: uppercase; letter-spacing: 0.05em;">Pending Reports</p>
                 <p style="font-family:'Barlow Condensed',sans-serif; font-weight:900; font-size:2.5rem; line-height:1; margin-top:8px;"><?= $pending_reports ?></p>
-                <a href="reports.php" style="color:var(--red); text-decoration:none; font-weight:700; font-size:0.8rem; margin-top:12px; display:inline-block;">View Reports →</a>
+                <a href="reports.php?status=pending" style="color:var(--red); text-decoration:none; font-weight:700; font-size:0.8rem; margin-top:12px; display:inline-block;">View Reports →</a>
             </div>
         </div>
 
