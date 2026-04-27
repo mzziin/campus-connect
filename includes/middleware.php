@@ -23,6 +23,7 @@ function require_login() {
 function require_approved() {
     require_login();
     if (!is_approved()) {
+        flash('info', 'Your account is waiting for admin approval.');
         redirect('pages/pending.php');
     }
 }
