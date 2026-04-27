@@ -79,9 +79,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $pdo->prepare("SELECT COUNT(*) FROM book_images WHERE book_id = ?");
                 $stmt->execute([$book_id]);
                 $current_image_count = $stmt->fetchColumn();
-                
-                // Check if removing all images
-                if (count($remove_images) >= $current_image_count) {
+
+                // Check if new images are being uploaded
+                $has_new_images = isset($_FILES['images']) && !empty($_FILES['images']['name'][0]);
+                $new_images_count = $has_new_images ? count($_FILES['images']['name']) : 0;
+
+                // Check if removing all images (only error if no new images are being uploaded)
+                if (!$has_new_images && count($remove_images) >= $current_image_count) {
+                    throw new Exception('At least one image is required. You cannot remove all images.');
+                }
+
+                // Also check if removing too many images (even with new uploads)
+                if (($current_image_count - count($remove_images) + $new_images_count) == 0) {
                     throw new Exception('At least one image is required. You cannot remove all images.');
                 }
                 
@@ -107,16 +116,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             // Upload new images
             if (isset($_FILES['images']) && !empty($_FILES['images']['name'][0])) {
+                // Check if there's a primary image after removals
+                $stmt = $pdo->prepare("SELECT COUNT(*) FROM book_images WHERE book_id = ? AND is_primary = 1");
+                $stmt->execute([$book_id]);
+                $has_primary = $stmt->fetchColumn() > 0;
+
                 // Get current image count after any removals
                 $stmt = $pdo->prepare("SELECT COUNT(*) FROM book_images WHERE book_id = ?");
                 $stmt->execute([$book_id]);
                 $current_image_count = $stmt->fetchColumn();
                 $new_images_count = count($_FILES['images']['name']);
-                
+
                 if ($current_image_count + $new_images_count > 5) {
                     throw new Exception('Maximum 5 images allowed.');
                 }
 
+                $first_image = true;
                 foreach ($_FILES['images']['tmp_name'] as $key => $tmp_name) {
                     if ($_FILES['images']['error'][$key] === UPLOAD_ERR_OK) {
                         $file = [
@@ -130,8 +145,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $upload_result = upload_book_image($file);
 
                         if ($upload_result['success']) {
-                            $stmt = $pdo->prepare("INSERT INTO book_images (book_id, image_path, is_primary) VALUES (?, ?, 0)");
-                            $stmt->execute([$book_id, $upload_result['path']]);
+                            // Set first image as primary if no primary exists
+                            $is_primary = ($first_image && !$has_primary) ? 1 : 0;
+                            $stmt = $pdo->prepare("INSERT INTO book_images (book_id, image_path, is_primary) VALUES (?, ?, ?)");
+                            $stmt->execute([$book_id, $upload_result['path'], $is_primary]);
+                            $first_image = false;
                         } else {
                             throw new Exception('Image upload failed: ' . $upload_result['error']);
                         }
