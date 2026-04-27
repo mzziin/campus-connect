@@ -245,6 +245,7 @@ $page_title = 'Dashboard — Campus Connect';
                                 <div style="display:flex;gap:6px;flex-wrap:wrap;">
                                     <a href="book_detail.php?id=<?= $book['id'] ?>" class="btn-sm btn-sm-black">View</a>
                                     <?php if ($book['status']==='available'): ?>
+                                        <a href="book_edit.php?id=<?= $book['id'] ?>" class="btn-sm btn-sm-yellow">Edit</a>
                                         <a href="inquiries.php" class="btn-sm btn-sm-yellow">Inquiries</a>
                                     <?php endif; ?>
                                 </div>

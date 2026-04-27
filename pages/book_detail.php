@@ -34,20 +34,67 @@ if (is_logged_in()) {
     if ($stmt->fetch()) $has_inquiry = true;
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'send_inquiry') {
-    $message = $_POST['message'] ?? '';
-    if ($book['seller_id'] == $_SESSION['user_id'])      flash('error', 'You cannot inquire about your own book.');
-    elseif ($book['status'] !== 'available')              flash('error', 'This book is not available.');
-    elseif ($has_inquiry)                                 flash('error', 'You already sent an inquiry.');
-    elseif (empty($message))                              flash('error', 'Please enter a message.');
-    else {
-        try {
-            $stmt = $pdo->prepare("INSERT INTO book_inquiries (book_id, buyer_id, message, status) VALUES (?, ?, ?, 'pending')");
-            $stmt->execute([$book_id, $_SESSION['user_id'], $message]);
-            flash('success', 'Inquiry sent!');
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $action = $_POST['action'] ?? '';
+    
+    if ($action === 'delete') {
+        // Verify ownership before deletion
+        if ($book['seller_id'] != $_SESSION['user_id']) {
+            flash('error', 'You do not have permission to delete this book.');
             redirect('book_detail.php?id=' . $book_id);
-        } catch (PDOException $e) {
-            flash('error', 'Something went wrong.');
+        }
+        
+        try {
+            $pdo->beginTransaction();
+            
+            // Delete images from server and database
+            $stmt = $pdo->prepare("SELECT image_path FROM book_images WHERE book_id = ?");
+            $stmt->execute([$book_id]);
+            $book_images = $stmt->fetchAll();
+            
+            foreach ($book_images as $image) {
+                $image_path = '../' . $image['image_path'];
+                if (file_exists($image_path)) {
+                    unlink($image_path);
+                }
+            }
+            
+            // Delete book images from database
+            $stmt = $pdo->prepare("DELETE FROM book_images WHERE book_id = ?");
+            $stmt->execute([$book_id]);
+            
+            // Delete related inquiries
+            $stmt = $pdo->prepare("DELETE FROM book_inquiries WHERE book_id = ?");
+            $stmt->execute([$book_id]);
+            
+            // Mark book as deleted (soft delete)
+            $stmt = $pdo->prepare("UPDATE books SET status = 'deleted', updated_at = NOW() WHERE id = ?");
+            $stmt->execute([$book_id]);
+            
+            $pdo->commit();
+            flash('success', 'Book listing deleted successfully.');
+            redirect('home.php');
+            
+        } catch (Exception $e) {
+            $pdo->rollBack();
+            flash('error', 'Failed to delete book listing.');
+            redirect('book_detail.php?id=' . $book_id);
+        }
+    } elseif ($action === 'send_inquiry') {
+        $message = $_POST['message'] ?? '';
+        if ($book['seller_id'] == $_SESSION['user_id'])      flash('error', 'You cannot inquire about your own book.');
+        elseif ($book['status'] !== 'available')              flash('error', 'This book is not available.');
+        elseif ($has_inquiry)                                 flash('error', 'You already sent an inquiry.');
+        elseif (empty($message))                              flash('error', 'Please enter a message.');
+        else {
+            try {
+                $stmt = $pdo->prepare("INSERT INTO book_inquiries (book_id, buyer_id, message, status) VALUES (?, ?, ?, 'pending')");
+                $stmt->execute([$book_id, $_SESSION['user_id'], $message]);
+                flash('success', 'Inquiry sent!');
+                redirect('book_detail.php?id=' . $book_id);
+            } catch (PDOException $e) {
+                flash('error', 'Something went wrong.');
+            }
         }
     }
 }
@@ -235,25 +282,15 @@ function condition_style(string $label): string {
                         <form method="POST">
                             <input type="hidden" name="action" value="send_inquiry">
                             <textarea name="message" rows="3" required class="textarea-field" style="margin-bottom:10px;" placeholder="Hi! I'm interested. Is it still available?"></textarea>
-                            <a class="btn-yellow" style="cursor:pointer;" onclick="this.closest('form').submit()">💬 Message Seller</a>
+                            <a class="btn-yellow" style="cursor:pointer;" onclick="this.closest('form').submit()"> Message Seller</a>
                         </form>
                     <?php endif; ?>
                 <?php elseif ($book['seller_id']==$_SESSION['user_id']): ?>
                     <div style="background:#fef9c3;border:2px solid #ca8a04;padding:12px;font-weight:600;font-size:.9rem;color:#854d0e;text-align:center;">This is your listing</div>
                 <?php endif; ?>
+
+                <a href="report.php?type=book&id=<?= $book['id'] ?>" class="mono" style="font-size:.7rem;color:#bbb;text-decoration:none;">Report this listing</a>
             </div>
-
-            <!-- Buy Now -->
-            <?php if ($book['status']==='available' && $book['seller_id']!=$_SESSION['user_id'] && !$has_inquiry): ?>
-                <div>
-                    <button class="btn-red" onclick="document.querySelector('.textarea-field')?.scrollIntoView({behavior:'smooth'});document.querySelector('.textarea-field')?.focus();">BUY NOW 🛒</button>
-                    <div class="mono" style="font-size:.68rem;color:#aaa;text-align:center;margin-top:8px;letter-spacing:.05em;text-transform:uppercase;">🔒 Secure Transaction with Campus Connect Protection</div>
-                </div>
-            <?php elseif ($book['status']==='sold'): ?>
-                <div style="background:#f3f4f6;border:2px solid #d1d5db;padding:16px;text-align:center;font-weight:700;font-size:1rem;text-transform:uppercase;color:#9ca3af;letter-spacing:.08em;">Sold Out</div>
-            <?php endif; ?>
-
-            <a href="report.php?type=book&id=<?= $book['id'] ?>" class="mono" style="font-size:.7rem;color:#bbb;text-decoration:none;">Report this listing</a>
         </div>
     </div>
 
