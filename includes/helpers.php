@@ -25,6 +25,39 @@ function get_flash() {
  * Redirect to a URL
  */
 function redirect($url) {
+    // If URL already starts with /campus-connect/, use as is
+    if (str_starts_with($url, '/campus-connect/')) {
+        header("Location: $url");
+        exit;
+    }
+    // If URL starts with / but not /campus-connect/, prepend it
+    if (str_starts_with($url, '/') && !str_starts_with($url, '/campus-connect/')) {
+        $url = '/campus-connect' . $url;
+        header("Location: $url");
+        exit;
+    }
+    // If URL is relative (doesn't start with / or http)
+    if (!str_starts_with($url, '/') && !str_starts_with($url, 'http')) {
+        // Remove any leading ../ or ./
+        $url = preg_replace('#^\.\.?/#', '', $url);
+        // If URL already has pages/ or admin/ prefix, prepend base path directly
+        if (str_starts_with($url, 'pages/') || str_starts_with($url, 'admin/')) {
+            $url = '/campus-connect/' . ltrim($url, '/');
+        } else {
+            // Detect current directory from script path
+            $script_path = $_SERVER['SCRIPT_NAME'] ?? '';
+            if (strpos($script_path, '/admin/') !== false) {
+                $url = '/campus-connect/admin/' . ltrim($url, '/');
+            } elseif (strpos($script_path, '/pages/') !== false) {
+                $url = '/campus-connect/pages/' . ltrim($url, '/');
+            } else {
+                $url = '/campus-connect/' . ltrim($url, '/');
+            }
+        }
+        header("Location: $url");
+        exit;
+    }
+    // For absolute URLs (http/https), use as is
     header("Location: $url");
     exit;
 }

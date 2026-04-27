@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $title,
                 $author ?: null,
                 $description ?: null,
-                $listing_type === 'sell' ? $price : null,
+                $listing_type === 'sell' ? number_format((float)$price, 2, '.', '') : null,
                 $listing_type
             ]);
 
@@ -111,51 +111,150 @@ $page_title = 'List a Book — Campus Connect';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($page_title) ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Barlow+Condensed:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root { --red: #E01B1B; --yellow: #F5C518; --black: #111111; --off-white: #F2F0EB; }
+        * { font-family: 'Barlow Condensed', sans-serif; }
+        .mono { font-family: 'Space Mono', monospace; }
+        body { background-color: var(--off-white); color: var(--black); }
+
+        .input-field {
+            width: 100%;
+            border: 2px solid var(--black);
+            background: #fff;
+            padding: 10px 14px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.85rem;
+            outline: none;
+            transition: box-shadow 0.15s;
+        }
+        .input-field:focus { box-shadow: 3px 3px 0 var(--black); }
+
+        .btn-primary {
+            background: var(--red);
+            color: #fff;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 8px 20px;
+            border: 2px solid var(--black);
+            box-shadow: 3px 3px 0 var(--black);
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+            display: inline-block;
+            text-decoration: none;
+        }
+        .btn-primary:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 4px 4px 0 var(--black);
+        }
+        .btn-primary:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0 var(--black);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--black);
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 6px 16px;
+            border: 2px solid var(--black);
+            cursor: pointer;
+            transition: background 0.15s;
+            display: inline-block;
+            text-decoration: none;
+        }
+        .btn-ghost:hover { background: #e5e3de; }
+
+        .card {
+            background: #fff;
+            border: 2px solid var(--black);
+            box-shadow: 4px 4px 0 var(--black);
+        }
+
+        .label {
+            display: block;
+            font-weight: 700;
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            color: var(--black);
+        }
+
+        .page-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 900;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: -0.01em;
+            line-height: 1;
+        }
+
+        .section-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-weight: 700;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 2px solid var(--black);
+            padding-bottom: 6px;
+            margin-bottom: 16px;
+        }
+
+        .flash-success { background: #f0fdf4; border: 2px solid #16a34a; color: #15803d; padding: 12px 16px; }
+        .flash-error   { background: #fef2f2; border: 2px solid var(--red); color: var(--red); padding: 12px 16px; }
+        .flash-warning { background: #fffbeb; border: 2px solid #f59e0b; color: #92400e; padding: 12px 16px; }
+        .flash-info    { background: #eff6ff; border: 2px solid #3b82f6; color: #1d4ed8; padding: 12px 16px; }
+
+        select.input-field { appearance: none; cursor: pointer; }
+        textarea.input-field { resize: vertical; }
+    </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
+<body>
     <?php require_once '../includes/header.php'; ?>
 
     <main class="max-w-2xl mx-auto px-4 py-8">
-        <h1 class="text-2xl font-bold text-gray-900 mb-6">List a Book</h1>
+        <div class="mb-8">
+            <h1 class="page-title mb-2">List a Book</h1>
+            <div style="width: 40px; height: 3px; background: var(--red);"></div>
+            <p class="mono mt-3" style="font-size: 0.8rem; color: #666;">Add your book to the campus marketplace.</p>
+        </div>
 
         <?php $flash = get_flash(); ?>
         <?php if ($flash): ?>
-            <div class="mb-6 px-4 py-3 rounded-lg border <?php
-                echo match($flash['type']) {
-                    'success' => 'bg-green-50 border-green-200 text-green-800',
-                    'error'   => 'bg-red-50 border-red-200 text-red-800',
-                    'warning' => 'bg-yellow-50 border-yellow-200 text-yellow-800',
-                    default   => 'bg-blue-50 border-blue-200 text-blue-800',
-                };
-            ?>">
+            <div class="<?= match($flash['type']) { 'success' => 'flash-success', 'error' => 'flash-error', 'warning' => 'flash-warning', default => 'flash-info' } ?> mb-6">
                 <?= e($flash['message']) ?>
             </div>
         <?php endif; ?>
 
         <form method="POST" action="" enctype="multipart/form-data">
             <!-- Section: Book Details -->
-            <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-6">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Book Details</h2>
-                
+            <div class="card p-6 mb-6">
+                <h2 class="section-title">Book Details</h2>
+
                 <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
-                    <input type="text" name="title" value="<?= e($_POST['title'] ?? '') ?>" required
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm
-                               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <label class="label">Title</label>
+                    <input type="text" name="title" value="<?= e($_POST['title'] ?? '') ?>" required class="input-field" placeholder="Book title">
                 </div>
 
                 <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Author</label>
-                    <input type="text" name="author" value="<?= e($_POST['author'] ?? '') ?>"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm
-                               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <label class="label">Author</label>
+                    <input type="text" name="author" value="<?= e($_POST['author'] ?? '') ?>" class="input-field" placeholder="Author name">
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                        <select name="category_id" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm
-                               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                        <label class="label">Category</label>
+                        <select name="category_id" class="input-field" required>
                             <option value="">Select Category</option>
                             <?php foreach ($categories as $cat): ?>
                             <option value="<?= $cat['id'] ?>" <?= ($_POST['category_id'] ?? '') == $cat['id'] ? 'selected' : '' ?>>
@@ -166,9 +265,8 @@ $page_title = 'List a Book — Campus Connect';
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Condition</label>
-                        <select name="condition_id" class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm
-                               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                        <label class="label">Condition</label>
+                        <select name="condition_id" class="input-field" required>
                             <option value="">Select Condition</option>
                             <?php foreach ($conditions as $cond): ?>
                             <option value="<?= $cond['id'] ?>" <?= ($_POST['condition_id'] ?? '') == $cond['id'] ? 'selected' : '' ?>>
@@ -180,59 +278,50 @@ $page_title = 'List a Book — Campus Connect';
                 </div>
 
                 <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                    <textarea name="description" rows="4"
-                              class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm
-                                     focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                              placeholder="Describe the book..."><?= e($_POST['description'] ?? '') ?></textarea>
+                    <label class="label">Description</label>
+                    <textarea name="description" rows="4" class="input-field" placeholder="Describe the book..."><?= e($_POST['description'] ?? '') ?></textarea>
                 </div>
             </div>
 
             <!-- Section: Listing Type -->
-            <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-6">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Listing Type</h2>
-                
+            <div class="card p-6 mb-6">
+                <h2 class="section-title">Listing Type</h2>
+
                 <div class="mb-4">
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="listing_type" value="sell" <?= ($_POST['listing_type'] ?? 'sell') == 'sell' ? 'checked' : '' ?> required>
-                        <span class="text-sm text-gray-700">For Sale</span>
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="radio" name="listing_type" value="sell" <?= ($_POST['listing_type'] ?? 'sell') == 'sell' ? 'checked' : '' ?> required style="width: 18px; height: 18px; accent: var(--red);">
+                        <span style="font-weight: 600; font-size: 0.9rem;">For Sale</span>
                     </label>
                 </div>
-                
+
                 <div class="mb-4">
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="listing_type" value="giveaway" <?= ($_POST['listing_type'] ?? '') == 'giveaway' ? 'checked' : '' ?>>
-                        <span class="text-sm text-gray-700">Giveaway (Free)</span>
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="radio" name="listing_type" value="giveaway" <?= ($_POST['listing_type'] ?? '') == 'giveaway' ? 'checked' : '' ?> style="width: 18px; height: 18px; accent: var(--red);">
+                        <span style="font-weight: 600; font-size: 0.9rem;">Giveaway (Free)</span>
                     </label>
                 </div>
 
                 <div id="price-field" class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Price (₹)</label>
-                    <input type="number" name="price" step="0.01" min="0" value="<?= e($_POST['price'] ?? '') ?>"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm
-                               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <label class="label">Price (₹)</label>
+                    <input type="number" name="price" step="0.01" min="0" value="<?= e($_POST['price'] ?? '') ?>" class="input-field" placeholder="0.00">
                 </div>
             </div>
 
             <!-- Section: Upload Images -->
-            <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-6">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Upload Images</h2>
-                
+            <div class="card p-6 mb-6">
+                <h2 class="section-title">Upload Images</h2>
+
                 <div class="mb-4">
-                    <input type="file" name="images[]" multiple accept="image/jpeg,image/png,image/webp"
-                        class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm
-                               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" required>
+                    <input type="file" name="images[]" multiple accept="image/jpeg,image/png,image/webp" class="input-field" required>
                 </div>
-                <p class="text-sm text-gray-500">First image will be the cover. Max 2MB each. 1-5 images allowed.</p>
+                <p class="mono" style="font-size: 0.75rem; color: #666;">First image will be the cover. Max 2MB each. 1-5 images allowed.</p>
             </div>
 
-            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 px-4 rounded-lg transition-colors">
-                List Book
-            </button>
+            <button type="submit" class="btn-primary w-full">List Book</button>
         </form>
 
-        <p class="mt-4 text-center text-sm text-gray-600">
-            <a href="home.php" class="text-blue-600 hover:underline">Back to Browse</a>
+        <p class="mt-6 text-center">
+            <a href="home.php" class="btn-ghost">Back to Browse</a>
         </p>
     </main>
 
@@ -242,7 +331,7 @@ $page_title = 'List a Book — Campus Connect';
                 document.getElementById('price-field').classList.toggle('hidden', r.value === 'giveaway');
             });
         });
-        
+
         // Initialize on page load
         const selectedType = document.querySelector('input[name="listing_type"]:checked');
         if (selectedType && selectedType.value === 'giveaway') {

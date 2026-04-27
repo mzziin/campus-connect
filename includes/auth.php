@@ -158,10 +158,6 @@ function login_user(string $email, string $password): array {
         return ['success' => false, 'error' => 'Your account has been banned.'];
     }
 
-    if ($user['account_status'] === 'pending') {
-        return ['success' => true, 'status' => 'pending'];
-    }
-
     // Verify password
     if (!password_verify($password, $user['password_hash'])) {
         return ['success' => false, 'error' => 'Invalid email or password.'];
@@ -175,6 +171,10 @@ function login_user(string $email, string $password): array {
     $_SESSION['user_name'] = $user['full_name'];
     $_SESSION['user_email'] = $user['email'];
     $_SESSION['user_status'] = $user['account_status'];
+
+    if ($user['account_status'] === 'pending') {
+        return ['success' => true, 'status' => 'pending'];
+    }
 
     return ['success' => true, 'status' => 'approved'];
 }

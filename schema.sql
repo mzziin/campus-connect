@@ -118,8 +118,9 @@ CREATE TABLE transactions (
     book_id         INT UNSIGNED NOT NULL,
     seller_id       INT UNSIGNED NOT NULL,
     buyer_id        INT UNSIGNED NOT NULL,
-    rating          TINYINT UNSIGNED NOT NULL,
+    rating          TINYINT UNSIGNED DEFAULT NULL,
     feedback        TEXT DEFAULT NULL,
+    status          ENUM('pending','completed') NOT NULL DEFAULT 'completed',
     completed_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE RESTRICT,

@@ -12,8 +12,7 @@ require_once __DIR__ . '/helpers.php';
 function require_login() {
     if (!is_logged_in()) {
         flash('error', 'Please login to access this page.');
-        header('Location: pages/login.php');
-        exit;
+        redirect('pages/login.php');
     }
 }
 
@@ -24,8 +23,8 @@ function require_login() {
 function require_approved() {
     require_login();
     if (!is_approved()) {
-        header('Location: pages/pending.php');
-        exit;
+        flash('info', 'Your account is waiting for admin approval.');
+        redirect('pages/pending.php');
     }
 }
 
@@ -36,8 +35,7 @@ function require_approved() {
 function require_admin() {
     if (!is_admin()) {
         flash('error', 'Admin access required.');
-        header('Location: admin/login.php');
-        exit;
+        redirect('admin/login.php');
     }
 }
 
@@ -48,11 +46,10 @@ function require_admin() {
 function redirect_if_logged_in() {
     if (is_logged_in()) {
         if (is_approved()) {
-            header('Location: pages/home.php');
+            redirect('pages/home.php');
         } else {
-            header('Location: pages/pending.php');
+            redirect('pages/pending.php');
         }
-        exit;
     }
 }
 
@@ -62,7 +59,6 @@ function redirect_if_logged_in() {
  */
 function redirect_if_admin_logged_in() {
     if (is_admin()) {
-        header('Location: admin/index.php');
-        exit;
+        redirect('admin/index.php');
     }
 }
