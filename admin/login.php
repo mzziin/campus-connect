@@ -100,9 +100,9 @@ $page_title = 'Login — Campus Connect';
         <div style="background:#fff; border:2px solid var(--black); box-shadow:6px 6px 0 var(--black); padding:40px 36px;">
 
             <div style="margin-bottom:28px;">
-                <h1 style="font-weight:900; font-size:2.2rem; text-transform:uppercase; line-height:1; color:var(--black); margin-bottom:4px;">Welcome Back</h1>
+                <h1 style="font-weight:900; font-size:2.2rem; text-transform:uppercase; line-height:1; color:var(--black); margin-bottom:4px;">Admin Portal</h1>
                 <div style="width:32px; height:3px; background:var(--red); margin-bottom:10px;"></div>
-                <p style="font-family:'Space Mono',monospace; font-size:0.75rem; color:#888;">Sign in to your campus account.</p>
+                <p style="font-family:'Space Mono',monospace; font-size:0.75rem; color:#888;">Sign in to your Admin account.</p>
             </div>
 
             <!-- Flash -->
@@ -141,7 +141,7 @@ $page_title = 'Login — Campus Connect';
 
         <!-- Admin link -->
         <div style="text-align:center; margin-top:20px;">
-            <a href="/campus-connect/admin/login.php" style="font-family:'Space Mono',monospace; font-size:0.7rem; color:#aaa; text-decoration:none; letter-spacing:0.05em;" class="hover:text-gray-600 transition-colors">Admin Login →</a>
+            <a href="/campus-connect/pages/login.php" style="font-family:'Space Mono',monospace; font-size:0.7rem; color:#aaa; text-decoration:none; letter-spacing:0.05em;" class="hover:text-gray-600 transition-colors">User Login →</a>
         </div>
     </div>
 </div>
