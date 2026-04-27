@@ -11,18 +11,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'] ?? '';
     $password = $_POST['password'] ?? '';
 
-    $result = login_user($email, $password);
-
-    if ($result['success']) {
-        if ($result['status'] === 'pending') {
-            flash('info', 'Your account is pending admin approval.');
-            redirect('pending.php');
-        } else {
-            flash('success', 'Welcome back!');
-            redirect('home.php');
-        }
+    if (empty($email) || empty($password)) {
+        flash('error', 'Email and password are required.');
     } else {
-        flash('error', $result['error']);
+        $result = login_user($email, $password);
+        if ($result['success']) {
+            flash('success', 'Welcome back!');
+            redirect('dashboard.php');
+        } else {
+            flash('error', $result['error']);
+        }
     }
 }
 
