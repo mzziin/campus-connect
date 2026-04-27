@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 $pdo->beginTransaction();
 
                 // Insert transaction with null rating/feedback, status completed
-                $stmt = $pdo->prepare("INSERT INTO transactions (conversation_id, book_id, seller_id, buyer_id, rating, feedback, status) VALUES (?, ?, ?, ?, NULL, NULL, 'completed')");
+                $stmt = $pdo->prepare("INSERT INTO transactions (conversation_id, book_id, seller_id, buyer_id, status) VALUES (?, ?, ?, ?, 'completed')");
                 $stmt->execute([
                     $conversation_id,
                     $conversation['book_id'],

@@ -149,6 +149,11 @@ function login_user(string $email, string $password): array {
         return ['success' => false, 'error' => 'Invalid email or password.'];
     }
 
+    // Verify password FIRST — before checking status
+    if (!password_verify($password, $user['password_hash'])) {
+        return ['success' => false, 'error' => 'Invalid email or password.'];
+    }
+
     // Check account status
     if ($user['account_status'] === 'rejected') {
         return ['success' => false, 'error' => 'Your account has been rejected. Contact admin for more information.'];
@@ -158,23 +163,18 @@ function login_user(string $email, string $password): array {
         return ['success' => false, 'error' => 'Your account has been banned.'];
     }
 
-    if ($user['account_status'] === 'pending') {
-        return ['success' => true, 'status' => 'pending'];
-    }
-
-    // Verify password
-    if (!password_verify($password, $user['password_hash'])) {
-        return ['success' => false, 'error' => 'Invalid email or password.'];
-    }
-
     // Regenerate session ID to prevent session fixation
     session_regenerate_id(true);
 
-    // Set session variables
+    // Set session variables (needed for both pending and approved users)
     $_SESSION['user_id'] = $user['id'];
     $_SESSION['user_name'] = $user['full_name'];
     $_SESSION['user_email'] = $user['email'];
     $_SESSION['user_status'] = $user['account_status'];
+
+    if ($user['account_status'] === 'pending') {
+        return ['success' => true, 'status' => 'pending'];
+    }
 
     return ['success' => true, 'status' => 'approved'];
 }

@@ -118,7 +118,8 @@ CREATE TABLE transactions (
     book_id         INT UNSIGNED NOT NULL,
     seller_id       INT UNSIGNED NOT NULL,
     buyer_id        INT UNSIGNED NOT NULL,
-    rating          TINYINT UNSIGNED NOT NULL,
+    status          ENUM('completed') NOT NULL DEFAULT 'completed',
+    rating          TINYINT UNSIGNED DEFAULT NULL,
     feedback        TEXT DEFAULT NULL,
     completed_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
