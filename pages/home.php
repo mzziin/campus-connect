@@ -255,7 +255,7 @@ require_once '../includes/header.php';
                     #<?= e($cat['name']) ?>
                 </a>
             <?php endforeach; ?>
-            <a href="home.php?type=giveaway" class="pill sale <?= $type_filter === 'giveaway' ? 'active' : '' ?>">#Sale</a>
+            <a href="home.php?type=sell" class="pill sale <?= $type_filter === 'sell' ? 'active' : '' ?>">#Sale</a>
         </div>
     </div>
 
