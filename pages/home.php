@@ -22,9 +22,9 @@ FROM books b
 JOIN categories c ON b.category_id = c.id
 JOIN book_conditions bc ON b.condition_id = bc.id
 JOIN users u ON b.seller_id = u.id
-WHERE b.status = 'available'";
+WHERE b.status = 'available' AND b.seller_id != ?";
 
-$params = [];
+$params = [$_SESSION['user_id']];
 
 if (!empty($search)) {
     $sql .= " AND (b.title LIKE ? OR b.author LIKE ? OR b.description LIKE ?)";
