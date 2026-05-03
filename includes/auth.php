@@ -291,3 +291,19 @@ function get_logged_in_user(): ?array {
     $stmt->execute([$_SESSION['user_id']]);
     return $stmt->fetch();
 }
+
+/**
+ * Check if current user is banned (checks database)
+ */
+function is_banned(): bool {
+    if (!is_logged_in()) {
+        return false;
+    }
+
+    $pdo = get_db();
+    $stmt = $pdo->prepare("SELECT account_status FROM users WHERE id = ?");
+    $stmt->execute([$_SESSION['user_id']]);
+    $status = $stmt->fetchColumn();
+
+    return $status === 'banned';
+}

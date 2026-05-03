@@ -19,9 +19,18 @@ function require_login() {
 /**
  * Require user to be approved
  * Redirects to pending page if account is not approved
+ * Logs out and redirects if user is banned
  */
 function require_approved() {
     require_login();
+
+    // Check if user is banned
+    if (is_banned()) {
+        logout();
+        flash('error', 'Your account has been banned by an administrator.');
+        redirect('pages/login.php');
+    }
+
     if (!is_approved()) {
         flash('info', 'Your account is waiting for admin approval.');
         redirect('pages/pending.php');
